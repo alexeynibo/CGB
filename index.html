@@ -44,6 +44,15 @@ body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .hd .lang svg{opacity:.6}
 .hd .cta{height:50px;padding:0 20px;border-radius:999px;background:var(--ink);color:#fff;display:flex;align-items:center;font-weight:600}
 
+/* preloader: the page appears only when every picture is in */
+#pl{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .5s}
+#pl.off{opacity:0;pointer-events:none}
+.pl-circle{position:relative;width:160px;height:160px;border-radius:50%;background:#fff;overflow:hidden;animation:pl-breathe 2.8s ease-in-out infinite alternate}
+@keyframes pl-breathe{from{width:160px;height:160px}to{width:180px;height:180px}}
+.pl-runner{position:absolute;left:50%;top:50%;width:58.1px;height:83px;transform:translate(calc(-50% - 2px),calc(-50% - 1px));background:url(assets/character/chip/run-sheet.png) 0 0/auto 83px no-repeat;animation:pl-run .533s steps(16) infinite}
+@keyframes pl-run{to{background-position-x:-929.6px}}
+.pl-label{font:500 14px/1 Inter,sans-serif;color:var(--ink-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
 /* left column */
 .copy{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad-x) clamp(40px,7vh,88px);width:72%}   /* may run over the stream: the players stay behind the text */
 h1{white-space:nowrap;font:800 clamp(52px,6.3vw,118px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.04em}
@@ -338,6 +347,71 @@ h1 em{font-style:normal;color:var(--cobalt)}
 </style>
 </head>
 <body>
+
+<div id="pl">
+  <div class="pl-circle"><div class="pl-runner" id="plRunner"></div></div>
+  <div class="pl-label" id="plLabel">Loading 0%</div>
+</div>
+<script>
+// the preloader: load every picture the page uses, then fade the cover away
+(function () {
+  const cover = document.getElementById('pl'), label = document.getElementById('plLabel'), runner = document.getElementById('plRunner');
+
+  // Chip's occasional drift: at rest on the spot, every 3-10s a smooth ~9px wander to a random side, back twice as fast
+  const OUT = 2.4, BACK = 1.2, AMP = 9;
+  const ss = u => u * u * (3 - 2 * u);
+  let nextAt = 3 + Math.random() * 7, anim = null;
+  const t0 = performance.now();
+  (function sway(now) {
+    const t = (now - t0) / 1000;
+    let dx = 0;
+    if (!anim && t >= nextAt) anim = { start: t, dir: Math.random() < 0.5 ? -1 : 1 };
+    if (anim) {
+      const ph = t - anim.start;
+      if (ph <= OUT) dx = anim.dir * AMP * ss(ph / OUT);
+      else if (ph <= OUT + BACK) dx = anim.dir * AMP * (1 - (ph - OUT) / BACK);
+      else { anim = null; nextAt = t + 3 + Math.random() * 7; }
+    }
+    runner.style.transform = `translate(calc(-50% - 2px + ${dx}px), calc(-50% - 1px))`;
+    requestAnimationFrame(sway);
+  })(t0);
+
+  // everything the page shows, so nothing pops in later
+  const SET1 = 'aisha amara ana arjun bao camille chloe diego elif emma ethan felix freya gustav hana haoran hugo ines ivy jake jonas kai kenji leila liam lucia lukas marco mateo max mei mina nina noah olivia omar pablo priya ravi rosa sakura sofia sven tara tom victor wen yuki zoe'.split(' ');
+  const SET2 = 'aisha amara ana arjun bao camille chloe diego elif emma ethan felix freya gustav hana haoran hugo ines ivy jake jiwoo jonas kai kenji leila liam lucia lukas marco mateo max mei mina nina noah olivia omar pablo priya ravi rosa sakura sofia sven tara tom victor wen yuki zoe'.split(' ');
+  const FUN = 'alien astro bear cat-black cat-ginger cat-tabby corgi cyber dino fox frog ghost golden hamster husky knight lizard mushroom ninja owl panda parrot penguin pirate pug rabbit robot shiba slime wizard'.split(' ');
+  const urls = [
+    'assets/character/chip/run-sheet.png',
+    ...Array.from({length: 16}, (_, i) => `assets/character/chip/run-${i}.png?v=3`),
+    ...[1, 2, 3, 4, 5].map(i => `assets/character/chip/idle-${i}.png?v=3`),
+    ...[1, 2, 3, 4, 5, 6].map(i => `assets/character/chip/brake-${i}.png?v=3`),
+    'assets/character/chip/sleep.png?v=3',
+    'assets/level/loop-flat.png', 'assets/level/ground-flat.png',
+    'assets/rewards/final-v4/gem.png', 'assets/rewards/final-v4/coin.png', 'assets/rewards/final-v4/star.png',
+    'assets/rewards/final-v4/heart.png', 'assets/rewards/final-v4/bolt.png',
+    'assets/cases/crystal-quest.jpg', 'assets/cases/coin-rush.jpg', 'assets/cases/heartbeat-farm.jpg',
+    'assets/cases/circuit-clash.jpg', 'assets/cases/star-tactics.jpg',
+    ...SET1.map(n => `assets/avatars/${n}.jpg`), ...SET2.map(n => `assets/avatars/v2/${n}.jpg`),
+    ...FUN.map(n => `assets/avatars/fun/${n}.jpg`)
+  ];
+  let done = 0, finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    label.textContent = 'Loading 100%';
+    setTimeout(() => { cover.classList.add('off'); setTimeout(() => cover.remove(), 600); }, 250);
+  };
+  urls.forEach(u => {
+    const im = new Image();
+    im.onload = im.onerror = () => {
+      label.textContent = `Loading ${Math.round(++done / urls.length * 100)}%`;
+      if (done === urls.length) finish();
+    };
+    im.src = u;
+  });
+  setTimeout(finish, 25000);   // never trap the page on a slow network
+})();
+</script>
 
 <section class="hero">
   <header class="hd">
