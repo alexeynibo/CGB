@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- the partner names on the cases screen, each set in its own face so they read as different logos (placeholders) -->
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Unbounded:wght@700&family=Comfortaa:wght@700&family=Syne:wght@800&family=Righteous&family=Archivo+Black&family=Sora:wght@700&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Unbounded:wght@700&family=Archivo+Black&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#F7F4EC;
@@ -49,7 +49,7 @@ body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 #pl.off{opacity:0;pointer-events:none}
 .pl-circle{position:relative;width:160px;height:160px;border-radius:50%;background:#fff;overflow:hidden;animation:pl-breathe 2.8s ease-in-out infinite alternate}
 @keyframes pl-breathe{from{width:160px;height:160px}to{width:180px;height:180px}}
-.pl-runner{position:absolute;left:50%;top:50%;width:58.1px;height:83px;transform:translate(calc(-50% - 2px),calc(-50% - 1px));background:url(assets/character/chip/run-sheet.png) 0 0/auto 83px no-repeat;animation:pl-run .533s steps(16) infinite}
+.pl-runner{position:absolute;left:50%;top:50%;width:58.1px;height:83px;transform:translate(calc(-50% - 2px),calc(-50% - 1px));background:url(assets/character/chip/run-sheet.webp) 0 0/auto 83px no-repeat;animation:pl-run .533s steps(16) infinite}
 @keyframes pl-run{to{background-position-x:-929.6px}}
 .pl-label{font:500 14px/1 Inter,sans-serif;color:var(--ink-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
 
@@ -232,7 +232,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 /* ================= screen 3: cases, a slider of the games we have helped grow =================
    Big art cards run off the right edge; drag, scroll sideways or use the arrows. Projects under NDA are dark,
    locked cards: the genre, the market and one result show, the rest is for a call. */
-.cases{position:relative;padding:clamp(48px,8vh,110px) 0 clamp(160px,24vh,320px);overflow:hidden}
+.cases{position:relative;padding:clamp(48px,8vh,110px) 0 120px;overflow:hidden}
 .cases-head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap;padding:0 var(--pad-x)}
 .cases h2{white-space:nowrap;font:800 clamp(48px,5.44vw,104px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.045em}
 .cases h2 em{font-style:normal;color:var(--cobalt)}
@@ -308,11 +308,10 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .case.nda::before{background:repeating-linear-gradient(135deg,rgba(255,255,255,.55) 0 2px,transparent 2px 14px)}   /* white stripes */
 .case.nda .art{display:none}
 .case.nda .chip{background:rgba(13,16,23,.07)}
-.case .padlock{position:absolute;left:50%;top:36%;width:clamp(84px,6vw,120px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
-  background:rgba(13,16,23,.06);display:grid;place-items:center;
+.case .padlock{position:absolute;left:50%;top:36%;width:142px;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:var(--paper);display:grid;place-items:center;
   font-size:clamp(20px,9.6cqw,56px)}   /* the same size as the cases' names, so the shackle is as thick as their arrow */
-/* one drawing, see-through as a whole: where the shackle meets the body nothing shows darker */
-.case .padlock svg{width:44%;height:44%;overflow:visible}
+.case .padlock svg{width:53%;height:53%;overflow:visible;opacity:.65;transform:translateY(-3px)}
 .case.nda .res span{opacity:1}
 .case.nda .meta{color:rgba(13,16,23,.62);text-shadow:none}
 .case.nda .hidden{display:inline-block;width:5.2em;height:.72em;border-radius:8px;background:rgba(13,16,23,.08);vertical-align:baseline}
@@ -327,8 +326,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
 /* the studios that joined the loop, running past */
 .clients{margin-top:clamp(80px,12vh,160px);padding:0 var(--pad)}
 .clients .st{font:700 13px/1 Inter,sans-serif;letter-spacing:.08em;color:var(--ink-3)}
-.marquee{margin:48px calc(-1 * var(--pad)) 0;overflow:hidden}   /* edge to edge: the names come in and go out past the screen's sides */
-.marquee div{display:flex;align-items:center;gap:clamp(48px,5vw,96px);width:max-content;animation:marquee 40s linear infinite;
+.marquee{margin:98px calc(-1 * var(--pad)) 0;overflow:hidden}   /* edge to edge: the names come in and go out past the screen's sides */
+.marquee div{display:flex;align-items:center;gap:119px;width:max-content;animation:marquee 40s linear infinite;
   font-size:clamp(32px,2.8vw,53.76px)}   /* each name's own face is sized in em from this */
 .marquee span{display:inline-flex;align-items:center;gap:.4em;line-height:1;color:rgba(13,16,23,.36);white-space:nowrap}
 .marquee span svg{width:.95em;height:.95em;flex:none;fill:currentColor}
@@ -336,7 +335,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 @media (prefers-reduced-motion:reduce){ .marquee div{animation:none} }
 
 /* the fine print under everything */
-.disc{padding:clamp(72px,11vh,130px) var(--pad-x) clamp(90px,13vh,150px);display:flex;justify-content:center}
+.disc{padding:0 var(--pad-x) 120px;display:flex;justify-content:center}
 .disc-card{max-width:840px;background:#fff;border-radius:24px;padding:clamp(40px,5vw,64px) clamp(28px,6vw,80px);
   text-align:center;box-shadow:0 24px 60px -36px rgba(13,16,23,.18)}
 .disc-card p{font-size:clamp(15px,1.05vw,17px);line-height:1.65;color:var(--ink-2)}
@@ -381,16 +380,19 @@ h1 em{font-style:normal;color:var(--cobalt)}
   const SET2 = 'aisha amara ana arjun bao camille chloe diego elif emma ethan felix freya gustav hana haoran hugo ines ivy jake jiwoo jonas kai kenji leila liam lucia lukas marco mateo max mei mina nina noah olivia omar pablo priya ravi rosa sakura sofia sven tara tom victor wen yuki zoe'.split(' ');
   const FUN = 'alien astro bear cat-black cat-ginger cat-tabby corgi cyber dino fox frog ghost golden hamster husky knight lizard mushroom ninja owl panda parrot penguin pirate pug rabbit robot shiba slime wizard'.split(' ');
   const urls = [
-    'assets/character/chip/run-sheet.png',
-    ...Array.from({length: 16}, (_, i) => `assets/character/chip/run-${i}.png?v=3`),
-    ...[1, 2, 3, 4, 5].map(i => `assets/character/chip/idle-${i}.png?v=3`),
-    ...[1, 2, 3, 4, 5, 6].map(i => `assets/character/chip/brake-${i}.png?v=3`),
-    'assets/character/chip/sleep.png?v=3',
-    'assets/level/loop-flat.png', 'assets/level/ground-flat.png',
-    'assets/rewards/final-v4/gem.png', 'assets/rewards/final-v4/coin.png', 'assets/rewards/final-v4/star.png',
-    'assets/rewards/final-v4/heart.png', 'assets/rewards/final-v4/bolt.png',
-    'assets/cases/crystal-quest.jpg', 'assets/cases/coin-rush.jpg', 'assets/cases/heartbeat-farm.jpg',
-    'assets/cases/circuit-clash.jpg', 'assets/cases/star-tactics.jpg',
+    'assets/character/chip/run-sheet.webp',
+    ...Array.from({length: 16}, (_, i) => `assets/character/chip/run-${i}.webp?v=3`),
+    ...[1, 2, 3, 4, 5].map(i => `assets/character/chip/idle-${i}.webp?v=3`),
+    ...[1, 2, 3, 4, 5, 6].map(i => `assets/character/chip/brake-${i}.webp?v=3`),
+    'assets/character/chip/sleep.webp?v=3',
+    'assets/level/loop-flat.webp', 'assets/level/ground-flat.webp',
+    'assets/rewards/final-v4/gem.webp', 'assets/rewards/final-v4/coin.webp', 'assets/rewards/final-v4/star.webp',
+    'assets/rewards/final-v4/heart.webp', 'assets/rewards/final-v4/bolt.webp'
+  ];
+  // the cases and the avatars are below the fold: they warm up in the background after the site shows
+  const lazyUrls = [
+    'assets/cases/crystal-quest.webp', 'assets/cases/coin-rush.webp', 'assets/cases/heartbeat-farm.webp',
+    'assets/cases/circuit-clash.webp', 'assets/cases/star-tactics.webp',
     ...SET1.map(n => `assets/avatars/${n}.jpg`), ...SET2.map(n => `assets/avatars/v2/${n}.jpg`),
     ...FUN.map(n => `assets/avatars/fun/${n}.jpg`)
   ];
@@ -399,6 +401,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
     if (finished) return;
     finished = true;
     label.textContent = 'Loading 100%';
+    // the below-the-fold pictures warm up in the background, the page itself is already usable
+    lazyUrls.forEach(u => { const im = new Image(); im.src = u; });
     setTimeout(() => { cover.classList.add('off'); setTimeout(() => cover.remove(), 600); }, 250);
   };
   urls.forEach(u => {
@@ -479,11 +483,11 @@ h1 em{font-style:normal;color:var(--cobalt)}
   // rewards: generated art, mobile-game style with a light painterly touch (assets/rewards/final-v4,
   // cropped to the object, 320 px max side). The earlier Arcane set stays in assets/rewards/final.
   const REWARDS = {
-    gem:   {src: 'assets/rewards/final-v4/gem.png',   w: 320, h: 251},
-    coin:  {src: 'assets/rewards/final-v4/coin.png',  w: 320, h: 315},
-    heart: {src: 'assets/rewards/final-v4/heart.png', w: 320, h: 275},
-    star:  {src: 'assets/rewards/final-v4/star.png',  w: 317, h: 320},
-    bolt:  {src: 'assets/rewards/final-v4/bolt.png',  w: 232, h: 320}
+    gem:   {src: 'assets/rewards/final-v4/gem.webp',   w: 320, h: 251},
+    coin:  {src: 'assets/rewards/final-v4/coin.webp',  w: 320, h: 315},
+    heart: {src: 'assets/rewards/final-v4/heart.webp', w: 320, h: 275},
+    star:  {src: 'assets/rewards/final-v4/star.webp',  w: 317, h: 320},
+    bolt:  {src: 'assets/rewards/final-v4/bolt.webp',  w: 232, h: 320}
   };
   const REWARD_SIDE = 202;       // on-screen longest side before the random 0.74–0.94 scale
   // preload, so a reward never pops up empty; and take the confetti colours from the picture itself
@@ -876,7 +880,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
   const ROBOT_H = 523;   // the standing robot, head to soles, at the common size
   const frameImg = {};
   Object.keys(FRAMES).forEach(n => {
-    const i = document.createElement('img'); i.src = `assets/character/chip/${n}.png?v=3`; i.alt = '';
+    const i = document.createElement('img'); i.src = `assets/character/chip/${n}.webp?v=3`; i.alt = '';
     robot.appendChild(i); frameImg[n] = i;
   });
   robot.addEventListener('animationend', () => robot.classList.remove('wake'));
@@ -967,8 +971,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
   }
 
   // ---- painted level: two loops (this one and the next), the ground strip in front of them ----
-  const LOOP_ART = {src: 'assets/level/loop-flat.png', w: 1100, h: 1110, cx: 558, cy: 532, run: 432};  // centre and running radius, px in the picture
-  const GROUND_ART = {src: 'assets/level/ground-flat.png', w: 1916, h: 380, run: 106};                 // run: the line the runner rolls on
+  const LOOP_ART = {src: 'assets/level/loop-flat.webp', w: 1100, h: 1110, cx: 558, cy: 532, run: 432};  // centre and running radius, px in the picture
+  const GROUND_ART = {src: 'assets/level/ground-flat.webp', w: 1916, h: 380, run: 106};                 // run: the line the runner rolls on
   // each stage's label is a number and a name on their own textPaths, placed by measured widths: a dx on a
   // tspan inside a textPath is spaced inconsistently by Chromium once the svg carries a fractional viewBox
   // and transforms, so the number came loose from the name. start offsets in px, recomputed in build()
@@ -1135,12 +1139,10 @@ h1 em{font-style:normal;color:var(--cobalt)}
       const half = e.offsetWidth / 2;
       e.style.left = `${Math.max(half + 16, Math.min(W - half - 16, x))}px`;
       e.animate([
-        // pops out of him, flies well up and fades only near the end
-        {transform: 'translate(-50%,-50%) scale(.4)', opacity: 0, easing: 'cubic-bezier(.3,1.6,.5,1)'},
-        {transform: 'translate(-50%,calc(-50% - 40px)) scale(1.08)', opacity: 1, offset: 0.15, easing: 'ease-out'},
-        {transform: 'translate(-50%,calc(-50% - 100px)) scale(1)', opacity: 1, offset: 0.4, easing: 'cubic-bezier(.4,0,.6,1)'},
-        {transform: 'translate(-50%,calc(-50% - 230px)) scale(.98)', opacity: 0.9, offset: 0.75, easing: 'ease-in'},
-        {transform: 'translate(-50%,calc(-50% - 300px)) scale(.95)', opacity: 0},
+        // pops out, floats straight up and fades out smoothly (no staged steps)
+        {transform: 'translate(-50%,calc(-50% - 0px)) scale(.4)', opacity: 0, easing: 'cubic-bezier(.3,1.6,.5,1)'},
+        {transform: 'translate(-50%,calc(-50% - 40px)) scale(1.08)', opacity: 1, offset: 0.12},
+        {transform: 'translate(-50%,calc(-50% - 300px)) scale(.95)', opacity: 0, easing: 'ease-out'}
       ], {duration: 2000}).onfinish = () => e.remove();
     }, k * 160);
   }
@@ -1367,17 +1369,17 @@ h1 em{font-style:normal;color:var(--cobalt)}
 // Key art: generated stand-ins for each game (assets/cases); foot — the colour the card darkens to under the text. nda — a locked card.
 (() => {
   const CASES = [
-    {name: 'Crystal Quest', genre: 'Puzzle RPG', market: 'US', time: '18 months', art: 'gem', key: 'assets/cases/crystal-quest.jpg', a1: '#8E9BFF', a2: '#2443F5',
+    {name: 'Crystal Quest', genre: 'Puzzle RPG', market: 'US', time: '18 months', art: 'gem', key: 'assets/cases/crystal-quest.webp', a1: '#8E9BFF', a2: '#2443F5',
      res: [['+45%', 'return on ad spend'], ['−32%', 'cost per install']]},
-    {name: 'Coin Rush', key: 'assets/cases/coin-rush.jpg', foot: '#1A0E05', genre: 'Casual runner', market: 'EU', time: '9 months', art: 'coin', a1: '#FFD36B', a2: '#E8761A',
+    {name: 'Coin Rush', key: 'assets/cases/coin-rush.webp', foot: '#1A0E05', genre: 'Casual runner', market: 'EU', time: '9 months', art: 'coin', a1: '#FFD36B', a2: '#E8761A',
      res: [['×2', 'installs a month'], ['+28%', 'day-7 retention']]},
     {nda: true, genre: 'Strategy', market: 'US · Top-10 grossing', a1: '#FF8A3D', res: [['+52%', 'return on ad spend']]},
-    {name: 'Heartbeat Farm', key: 'assets/cases/heartbeat-farm.jpg', foot: '#22060F', genre: 'Farming sim', market: 'Asia', time: '2 years', art: 'heart', a1: '#FF9DB4', a2: '#D92A55',
+    {name: 'Heartbeat Farm', key: 'assets/cases/heartbeat-farm.webp', foot: '#22060F', genre: 'Farming sim', market: 'Asia', time: '2 years', art: 'heart', a1: '#FF9DB4', a2: '#D92A55',
      res: [['+61%', 'revenue'], ['+3', 'new markets']]},
-    {name: 'Circuit Clash', genre: 'PvP shooter', market: 'Global', time: '12 months', art: 'bolt', key: 'assets/cases/circuit-clash.jpg', foot: '#03100C', a1: '#7FE8C4', a2: '#0F9460',
+    {name: 'Circuit Clash', genre: 'PvP shooter', market: 'Global', time: '12 months', art: 'bolt', key: 'assets/cases/circuit-clash.webp', foot: '#03100C', a1: '#7FE8C4', a2: '#0F9460',
      res: [['+180K', 'installs at launch'], ['−40%', 'cost per install']]},
     {nda: true, genre: 'Match-3', market: 'EU · Asia', a1: '#4D7CFF', res: [['−38%', 'cost per install']]},
-    {name: 'Star Tactics', key: 'assets/cases/star-tactics.jpg', foot: '#0D0820', genre: 'Auto-battler', market: 'LatAm', time: '14 months', art: 'star', a1: '#C3A6FF', a2: '#6B3FE0',
+    {name: 'Star Tactics', key: 'assets/cases/star-tactics.webp', foot: '#0D0820', genre: 'Auto-battler', market: 'LatAm', time: '14 months', art: 'star', a1: '#C3A6FF', a2: '#6B3FE0',
      res: [['+74%', 'paying players'], ['×3', 'creative hit rate']]},
     {nda: true, genre: 'Idle RPG', market: 'Global', a1: '#2FD39A', res: [['×3', 'paying players']]},
   ];
@@ -1389,9 +1391,9 @@ h1 em{font-style:normal;color:var(--cobalt)}
   };
   const STUDIOS = [
     ['Pixel Forge', '700 1em "Space Mono",monospace', 'square'], ['Nova Games', '700 .9em Unbounded,sans-serif', 'ring'],
-    ['Tidewater', '700 1em Comfortaa,sans-serif', 'half'], ['Kite Studio', '800 1em Syne,sans-serif', 'diamond'],
-    ['Moonbyte', '400 1.05em Righteous,sans-serif', 'moon'], ['Redfox Play', '400 .95em "Archivo Black",sans-serif', 'tri'],
-    ['Arcadia Labs', '700 .95em Sora,sans-serif', ''], ['Boltworks', '400 .85em "Rubik Mono One",sans-serif', ''],
+    ['Tidewater', '400 1.05em "Archivo Black",sans-serif', 'half'], ['Kite Studio', '700 1em Unbounded,sans-serif', 'diamond'],
+    ['Moonbyte', '400 1.05em "Space Mono",monospace', 'moon'], ['Redfox Play', '400 .95em "Archivo Black",sans-serif', 'tri'],
+    ['Arcadia Labs', '700 .95em "Space Mono",monospace', ''], ['Boltworks', '700 .9em Unbounded,sans-serif', ''],
   ];
   const pad2 = n => String(n).padStart(2, '0');
 
