@@ -17,6 +17,8 @@
   --ink-3:#6B6F79;
   --cobalt:#2443F5;
   --pad:clamp(24px,7vw,160px);
+  --cw:1500px;                                            /* the content column: 100px narrower than 1920's 1600 */
+  --pad-x:max(var(--pad), calc((100vw - var(--cw)) / 2));   /* past 1820 the column stays 1500, centred; the rest stretches */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--paper);color:var(--ink)}
@@ -25,7 +27,7 @@ body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;flex-direction:column}
 
 /* header */
-.hd{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;height:88px;padding:0 var(--pad);font:500 15px Inter,sans-serif}
+.hd{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;height:88px;padding:0 var(--pad-x);font:500 15px Inter,sans-serif}
 .logo{display:flex;align-items:center;gap:10px;font:800 22px/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
 .logo i{width:34px;height:34px;border-radius:9px;background:var(--cobalt);display:flex;align-items:center;justify-content:center;font:800 11px/1 "Bricolage Grotesque",sans-serif;color:#fff;letter-spacing:.02em}
 .hd-r{display:flex;align-items:center;gap:12px}
@@ -35,7 +37,7 @@ body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .hd .cta{height:44px;padding:0 20px;border-radius:999px;background:var(--ink);color:#fff;display:flex;align-items:center;font-weight:600}
 
 /* left column */
-.copy{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad) clamp(40px,7vh,88px);width:72%}   /* may run over the stream: the players stay behind the text */
+.copy{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad-x) clamp(40px,7vh,88px);width:72%}   /* may run over the stream: the players stay behind the text */
 h1{white-space:nowrap;font:800 clamp(52px,6.3vw,118px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.04em}
 h1 em{font-style:normal;color:var(--cobalt)}
 .lead{margin-top:clamp(24px,4vh,40px);max-width:30em;font-size:clamp(17px,1.3vw,21px);line-height:1.5;color:var(--ink-2)}
@@ -74,7 +76,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 /* ---------- the stream: a crowd of players rising; rewards pop up inside it ---------- */
 /* the box is 140 px wider on each side than the area the objects are placed in: the bottom fade (a mask)
    clips at the box edge, and swaying objects must never be cut */
-.stream{position:absolute;z-index:1;top:0;bottom:0;right:calc(clamp(32px,6vw,120px) - 140px);width:calc(40% + 280px);pointer-events:none;
+.stream{position:absolute;z-index:1;top:0;bottom:0;right:calc(var(--pad-x) - 185px);width:calc(40% + 280px);pointer-events:none;
   -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 96%,transparent 100%);
           mask-image:linear-gradient(to bottom,#000 0,#000 96%,transparent 100%)}
 .fl{position:absolute;left:0;top:0;will-change:transform}
@@ -110,8 +112,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .loop{position:relative;height:540vh;overflow-x:clip}   /* margin-top is set by the script: room for the top of the loop */
 /* the stage is cut at the sides and the bottom only: on the way in, the top of the loop shows above it */
 .loop .stage{position:sticky;top:0;height:100vh;height:100svh;clip-path:inset(-100vh 0 0 0)}
-.run-head{position:absolute;left:var(--pad);top:clamp(72px,13vh,160px);z-index:9}   /* the text is over the level */
-.loop h2{white-space:nowrap;font:800 clamp(48px,5.44vw,120px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.045em}
+.run-head{position:absolute;left:var(--pad-x);top:clamp(72px,13vh,160px);z-index:9}   /* the text is over the level */
+.loop h2{white-space:nowrap;font:800 clamp(48px,5.44vw,104px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.045em}
 .loop h2 em{font-style:normal;color:var(--cobalt)}
 
 /* the world moves under the camera */
@@ -123,7 +125,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .ground-fill{position:absolute;left:0;background:#DAD2C2}  /* the colour the painted earth fades into at its bottom */
 /* the level's name at its start, level with the runner's shoulder: LOOP 01, and LOOP 02 at the next one.
    Set like the label on the cards */
-.loop-tag{position:absolute;left:var(--pad);top:0;z-index:9;transform:translateY(-50%);white-space:nowrap;
+.loop-tag{position:absolute;left:var(--pad-x);top:0;z-index:9;transform:translateY(-50%);white-space:nowrap;
   font:700 13px/1 Inter,sans-serif;letter-spacing:.08em;color:var(--cobalt)}
 
 /* the five points inside a loop */
@@ -138,14 +140,14 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .ring-text .lit .n{fill:var(--cobalt)}
 
 /* before the first card: an invitation to play the level together */
-.invite{position:absolute;left:var(--pad);z-index:9;width:clamp(300px,27vw,500px);transition:opacity .35s,transform .45s}
+.invite{position:absolute;left:var(--pad-x);z-index:9;width:clamp(300px,27vw,500px);transition:opacity .35s,transform .45s}
 .invite.away{opacity:0;transform:translateY(-16px);pointer-events:none}
-.invite h3{white-space:nowrap;font:800 clamp(28px,2.2vw,44px)/1.05 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+.invite h3{white-space:nowrap;font:800 clamp(28px,2.2vw,42px)/1.05 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
 .invite p{margin-top:14px;font-size:clamp(16px,1.1vw,20px);line-height:1.5;color:var(--ink-2)}
 
 /* the cards stack up in one place under the title */
 /* pulled left by the card's own padding, so its text lines up with the title (the white edge hangs outside) */
-.stack{--in:clamp(26px,2vw,40px);position:absolute;left:calc(var(--pad) - var(--in));z-index:7;width:clamp(340px,29vw,540px)}
+.stack{--in:clamp(26px,2vw,40px);position:absolute;left:calc(var(--pad-x) - var(--in));z-index:7;width:clamp(340px,29vw,540px)}
 /* the same inset on every side; the cards are made as tall as the tallest and the last line keeps to the bottom */
 .plate{position:absolute;left:0;top:0;width:100%;padding:var(--in);display:flex;flex-direction:column;border-radius:24px;background:#fff;
   box-shadow:0 28px 60px -32px rgba(13,16,23,.3);transform-origin:50% 100%;
@@ -155,15 +157,15 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .plate > *{transition:opacity .3s}
 .plate.back > *{opacity:0}
 .plate .st{font:700 13px/1 Inter,sans-serif;letter-spacing:.08em;color:var(--cobalt)}
-.plate h3{margin-top:12px;font:800 clamp(28px,2vw,40px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+.plate h3{margin-top:12px;font:800 clamp(28px,2vw,38px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
 .plate p{margin-top:10px;font-size:clamp(15px,.95vw,18px);line-height:1.45;color:var(--ink-2)}
 /* the step number and the title share the first line */
 .plate .top{display:flex;align-items:baseline;gap:12px}
 .plate .top h3{margin:0}
-.plate .top .st{font:800 clamp(28px,2vw,40px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}   /* the number as big as the name */
+.plate .top .st{font:800 clamp(28px,2vw,38px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}   /* the number as big as the name */
 .plate .v{margin-top:auto;padding-top:18px;display:flex;align-items:center;gap:10px}
 .plate .v span{font:500 clamp(14px,.9vw,16px)/1.3 Inter,sans-serif;color:var(--ink-3)}
-.plate .v b{font:800 clamp(34px,2.4vw,48px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:#13A86B}
+.plate .v b{font:800 clamp(34px,2.4vw,46px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:#13A86B}
 /* the change badge: an arrow in a soft green circle */
 /* when its card comes in, the circle pops up and the arrow slides into it */
 .chg{flex:none;width:clamp(28px,2vw,36px);height:clamp(28px,2vw,36px);border-radius:50%;background:#E3F6EC;position:relative;overflow:hidden;
@@ -214,8 +216,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
    Big art cards run off the right edge; drag, scroll sideways or use the arrows. Projects under NDA are dark,
    locked cards: the genre, the market and one result show, the rest is for a call. */
 .cases{position:relative;padding:clamp(48px,8vh,110px) 0 clamp(160px,24vh,320px);overflow:hidden}
-.cases-head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap;padding:0 var(--pad)}
-.cases h2{white-space:nowrap;font:800 clamp(48px,5.44vw,120px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.045em}
+.cases-head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap;padding:0 var(--pad-x)}
+.cases h2{white-space:nowrap;font:800 clamp(48px,5.44vw,104px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.045em}
 .cases h2 em{font-style:normal;color:var(--cobalt)}
 .cases-side{display:flex;flex-direction:column;align-items:flex-end;gap:28px}
 .cases-side p{max-width:24em;text-align:right;font-size:clamp(16px,1.1vw,20px);line-height:1.5;color:var(--ink-2)}
@@ -310,14 +312,14 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .clients .st{font:700 13px/1 Inter,sans-serif;letter-spacing:.08em;color:var(--ink-3)}
 .marquee{margin:48px calc(-1 * var(--pad)) 0;overflow:hidden}   /* edge to edge: the names come in and go out past the screen's sides */
 .marquee div{display:flex;align-items:center;gap:clamp(48px,5vw,96px);width:max-content;animation:marquee 40s linear infinite;
-  font-size:clamp(32px,2.8vw,54px)}   /* each name's own face is sized in em from this */
+  font-size:clamp(32px,2.8vw,53.76px)}   /* each name's own face is sized in em from this */
 .marquee span{display:inline-flex;align-items:center;gap:.4em;line-height:1;color:rgba(13,16,23,.36);white-space:nowrap}
 .marquee span svg{width:.95em;height:.95em;flex:none;fill:currentColor}
 @keyframes marquee{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){ .marquee div{animation:none} }
 
 /* the fine print under everything */
-.disc{padding:clamp(72px,11vh,130px) var(--pad) clamp(90px,13vh,150px);display:flex;justify-content:center}
+.disc{padding:clamp(72px,11vh,130px) var(--pad-x) clamp(90px,13vh,150px);display:flex;justify-content:center}
 .disc-card{max-width:840px;background:#fff;border-radius:24px;padding:clamp(40px,5vw,64px) clamp(28px,6vw,80px);
   text-align:center;box-shadow:0 24px 60px -36px rgba(13,16,23,.18)}
 .disc-card p{font-size:clamp(15px,1.05vw,17px);line-height:1.65;color:var(--ink-2)}
@@ -958,6 +960,10 @@ h1 em{font-style:normal;color:var(--cobalt)}
     // runs past the top and the right edge; its centre right under the centre of the players' stream on the first screen
     const sr = document.querySelector('.stream').getBoundingClientRect();
     LX = (sr.left + sr.right) / 2;
+    // wide screens: the content column stops at 1500px, but the loop grows with the window — so on very wide screens
+    // keep it clear of the invitation text instead of hugging the stream's centre
+    const inv = $('invite');
+    if (inv) LX = Math.max(LX, inv.offsetLeft + inv.offsetWidth + R + 56);
     LX2 = LX + W * 1.2 + R;                     // the next loop
     const pad = $('runHead').offsetLeft;
     // the level's name stands at the left edge of the text column, level with the shoulder of the standing runner,
