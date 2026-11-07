@@ -1451,8 +1451,10 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const mark = Math.floor(distSm / (RH * 0.44));
     if (mark !== stepMark) { stepMark = mark; if (v > 70) spawnFoot(q, camX, camY, facing); }
     const grown = Math.pow(GROW, sizeN - 1);   // Chip grows 20% every loop; the bubble rides up and to the right with him
+    // the bubble's TOP keeps his head clearance at every size: 251 = 187 (the tuned lift) + ~64 (one line of text),
+    // scaled by his growth; the live height is subtracted so two-line phrases sit just as clear of his face
     bubble.style.setProperty('--bx', Math.round(42 * grown) + 'px');
-    bubble.style.setProperty('--by', Math.round(187 * grown) + 'px');
+    bubble.style.setProperty('--by', Math.round(251 * grown - (bubble.offsetHeight || 64)) + 'px');
     const name = `LOOP ${String(q.lap === 2 ? loopN + 1 : loopN).padStart(2, '0')}`;
     if (tag.textContent !== name) tag.textContent = name;
     // left standing on the loop for a while, he rolls off it: back down if he is less than halfway round, on to
