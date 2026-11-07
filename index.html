@@ -220,8 +220,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
 /* the chip that flies up from Chip as he passes a stage; over the loop art (30), under the ground strip (40) */
 .fly{position:absolute;z-index:32;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;
   box-shadow:0 14px 30px -12px rgba(13,16,23,.32);white-space:nowrap;pointer-events:none;opacity:0}
-.bubble{position:absolute;left:calc(50% + var(--bx,42px));bottom:calc(100% + var(--by,187px));transform:translateY(8px) scale(.92);transform-origin:var(--tailx,10%) 100%;background:#fff;border-radius:18px;padding:19px 29px;font:600 18px/1.35 Inter,sans-serif;color:var(--ink);white-space:normal;width:max-content;max-width:300px;box-shadow:0 14px 30px -10px rgba(13,16,23,.3);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:5;box-sizing:border-box}
-.bubble::after{content:'';position:absolute;left:var(--tailx,10%);top:calc(100% - 1px);border:8px solid transparent;border-top:16px solid #fff;transform:rotate(16deg);transform-origin:50% 0;filter:drop-shadow(0 3px 2px rgba(13,16,23,.12))}
+.bubble{position:absolute;left:calc(50% + var(--bx,42px));bottom:calc(100% + var(--by,187px));transform:translateY(8px) scale(.92);transform-origin:var(--tailx,10%) 100%;background:#fff;border-radius:calc(18px*var(--bs,1));padding:calc(19px*var(--bs,1)) calc(29px*var(--bs,1));font:600 calc(18px*var(--bs,1))/1.35 Inter,sans-serif;color:var(--ink);white-space:normal;width:max-content;max-width:calc(300px*var(--bs,1));box-shadow:0 14px 30px -10px rgba(13,16,23,.3);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:5;box-sizing:border-box}
+.bubble::after{content:'';position:absolute;left:var(--tailx,10%);top:calc(100% - 1px);border:calc(8px*var(--bs,1)) solid transparent;border-top:calc(16px*var(--bs,1)) solid #fff;transform:rotate(16deg);transform-origin:50% 0;filter:drop-shadow(0 calc(3px*var(--bs,1)) calc(2px*var(--bs,1)) rgba(13,16,23,.12))}
 .bubble.below{bottom:auto;top:calc(100% + var(--by,187px))}
 .bubble.below::after{top:auto;bottom:calc(100% - 1px);border-top:0;border-bottom:16px solid #fff;transform:rotate(-16deg)}
 .bubble.on{opacity:1;transform:translateY(0) scale(1)}
@@ -1387,6 +1387,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
     // layer order: text (10) < loop (30) < grass (40). The runner is in front on the roll-in; from the moment he steps
     // on the circle he stays behind the loop through the whole lap and the run-out, in front again only as the next lap begins
     runner.style.zIndex = (q.turn > 0 && q.lap === 1) ? 20 : 35;
+    bubble.style.setProperty('--bs', bubbleScale.toFixed(3));   // the whole bubble belongs to Chip: it scales with him
     bubble.style.setProperty('--bx', Math.round(42 * bubbleScale) + 'px');
     bubble.style.setProperty('--by', Math.round(187 * bubbleScale * Math.pow(GROW, sizeN - 1)) + 'px');   // Chip grows 20% every loop; the bubble rides up with him, scaled to his current size
     const name = `LOOP ${String(q.lap === 2 ? loopN + 1 : loopN).padStart(2, '0')}`;
@@ -1721,15 +1722,19 @@ h1 em{font-style:normal;color:var(--cobalt)}
   const SPEED = 64, EMIT = 1.04, OPEN = 0.46;   // a touch faster than the stream (53), same shape
   const COUNT = 60;                             // as many as the narrow band fits without touching
   const GAP = 18;                               // clear air between circle edges, sway included
-  const X0 = 0.58, X1 = 0.985;                  // the band they live in: a narrower stream, right of the middle
   const WARM = '#D9D1BC', COOL = '#D3D7DB', SAND = '#D6CCB2';
-  const CENTER = (X0 + X1) / 2;                 // the fountain's mouth sits mid-band
+  const streamEl = document.querySelector('.stream');
   let W = 0, H = 0, dots = [];
+  let X0 = 0.58, X1 = 0.985, CENTER = 0.78;       // the band they live in: over the players' stream, set from its real spot
   const size = () => {
     const w2 = box.clientWidth, h2 = box.clientHeight;
     if (W && (w2 !== W || h2 !== H))   // the window resized: carry the crowd over, so nobody is left off-screen
       dots.forEach(d => { d.x *= w2 / W; d.y *= h2 / H; });
     W = w2; H = h2;
+    const m = Math.min(24, W * 0.015);            // a small inset from the stream box's edges
+    X0 = (streamEl.offsetLeft + m) / W;
+    X1 = (streamEl.offsetLeft + streamEl.offsetWidth - m) / W;
+    CENTER = (X0 + X1) / 2;
   };
   size();
   window.addEventListener('resize', size);
