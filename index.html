@@ -220,12 +220,17 @@ h1 em{font-style:normal;color:var(--cobalt)}
 /* the chip that flies up from Chip as he passes a stage; over the loop art (30), under the ground strip (40) */
 .fly{position:absolute;z-index:32;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;
   box-shadow:0 14px 30px -12px rgba(13,16,23,.32);white-space:nowrap;pointer-events:none;opacity:0}
-.bubble{position:absolute;left:calc(50% + var(--bx,42px));bottom:calc(100% + var(--by,187px));transform:translateY(8px) scale(.92);transform-origin:var(--tailx,10%) 100%;background:#fff;border-radius:calc(18px*var(--bs,1));padding:calc(19px*var(--bs,1)) calc(29px*var(--bs,1));font:600 calc(18px*var(--bs,1))/1.35 Inter,sans-serif;color:var(--ink);white-space:normal;width:max-content;max-width:calc(300px*var(--bs,1));box-shadow:0 14px 30px -10px rgba(13,16,23,.3);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:5;box-sizing:border-box}
-.bubble::after{content:'';position:absolute;left:var(--tailx,10%);top:calc(100% - 1px);border:calc(8px*var(--bs,1)) solid transparent;border-top:calc(16px*var(--bs,1)) solid #fff;transform:rotate(16deg);transform-origin:50% 0;filter:drop-shadow(0 calc(3px*var(--bs,1)) calc(2px*var(--bs,1)) rgba(13,16,23,.12))}
+.bubble{position:absolute;left:calc(50% + var(--bx,42px));bottom:calc(100% + var(--by,187px));transform:translateY(8px) scale(.92);transform-origin:var(--tailx,10%) 100%;background:#fff;border-radius:18px;padding:19px 29px;font:600 18px/1.35 Inter,sans-serif;color:var(--ink);white-space:normal;width:max-content;max-width:300px;box-shadow:0 14px 30px -10px rgba(13,16,23,.3);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:5;box-sizing:border-box}
+.bubble::after{content:'';position:absolute;left:var(--tailx,10%);top:calc(100% - 1px);border:8px solid transparent;border-top:16px solid #fff;transform:rotate(16deg);transform-origin:50% 0;filter:drop-shadow(0 3px 2px rgba(13,16,23,.12))}
 .bubble.below{bottom:auto;top:calc(100% + var(--by,187px))}
 .bubble.below::after{top:auto;bottom:calc(100% - 1px);border-top:0;border-bottom:16px solid #fff;transform:rotate(-16deg)}
 .bubble.on{opacity:1;transform:translateY(0) scale(1)}
 .fly b{font:800 clamp(20px,1.4vw,26px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em;color:#13A86B;font-variant-numeric:tabular-nums}
+
+/* grass answer: blades bursting from under Chip's feet and the dust of the step; over the loop art and the strip */
+.blade{position:absolute;left:0;top:0;width:6px;height:11px;border-radius:2px;pointer-events:none;z-index:42}
+.puff{position:absolute;left:0;top:0;width:56px;height:20px;border-radius:50%;pointer-events:none;z-index:41;
+  background:radial-gradient(closest-side,rgba(170,160,130,.5),transparent 72%);filter:blur(3px)}
 .fly span{font:500 clamp(13px,.85vw,15px)/1.2 Inter,sans-serif;color:var(--ink-3)}
 
 /* the runner: Chip the robot. Its anchor is the point under its feet; it turns with the loop.
@@ -1070,7 +1075,6 @@ h1 em{font-style:normal;color:var(--cobalt)}
   // ---- geometry, in screen pixels (rebuilt on resize) ----
   let W, H, GY, R, r, X0, LX, LX2, STEP = 36;
   let RC = 0, DY = 0, GLUE = 0, ROB_OFF = 0;   // the ring's circle: 76% of the old loop after the panel, dropped 94px (set in build); GLUE/ROB_OFF freeze the loop-to-ground fit at the 1440 geometry
-  let bubbleScale = 1;   // the bubble offsets (42/187 px) were tuned at 1920×1080's robot height; at any other window they track his actual size
   const LINE_DY = 12;   // the straight track sits 12px below the old ground line (tracks panel)
   const RING = {size: 0.120, radius: 0.8};   // the names round the loop: font size and circle radius, as shares of the loop radius (panel: 83% size, 80% radius)
   function build() {
@@ -1078,7 +1082,6 @@ h1 em{font-style:normal;color:var(--cobalt)}
     GY = H * 0.86;                              // the line the runner rolls on (just under the grass tips)
     const RH0 = Math.max(180, Math.min(H * 0.255, 345));   // the robot's height on the first loop
     RH = RH0 * Math.pow(GROW, Math.min(sizeN, MAX_LOOPS) - 1); // bigger with every loop he finishes
-    bubbleScale = RH0 / (1080 * 0.255);   // 1080·0.255 is the RH0 the bubble's 42/187 px offsets were tuned at
     r = RH0 * 0.3;                              // half its stride: keeps the start clear of the edge
     R = Math.max(H * 0.42, Math.min(W, 1920) * 0.28);   // loop radius, to the line the runner rolls on: a huge loop that
     // runs past the top and the right edge; its centre right under the centre of the players' stream on the first screen.
@@ -1262,6 +1265,49 @@ h1 em{font-style:normal;color:var(--cobalt)}
   const BRAKE_T = 0.6, STOP = 0.15;   // seconds: the whole stop; without moving this long, the runner stands
   function brakeFrame(u) { for (const [f, d] of BRAKE) { if (u < d) return f; u -= d; } return 'brake-6'; }
 
+  // ---- the grass answers his steps: blades burst from under the foot (toward the ring's centre on the loop,
+  //      upward on the straight) with a puff of dust; nothing while he stands ----
+  let stepMark = 0, wasBrakePose = false;
+  const BLADES = ['#6B9B47', '#59863C', '#7CAB54'];
+  function spawnFoot(q, camX, camY, facing, burst) {
+    const bx = q.x + slide - camX, by = q.y - camY;
+    const onLoop = q.turn > 0 && q.lap === 1;
+    let dirx = 0, diry = -1;
+    if (onLoop) {
+      const dx = (LX + TRJ.dx) - (q.x + slide), dy = (GY + ROB_OFF - RC * TRJ.r) - q.y, L = Math.hypot(dx, dy) || 1;
+      dirx = dx / L; diry = dy / L;
+    }
+    const k = burst ? 1.35 : 1;   // the skid sprays wider and harder
+    for (let i = 0; i < (burst ? 18 : 3); i++) {
+      const b = document.createElement('i');
+      b.className = 'blade';
+      b.style.background = BLADES[i % BLADES.length];
+      b.style.left = `${bx.toFixed(1)}px`; b.style.top = `${by.toFixed(1)}px`;
+      stage.appendChild(b);
+      let vx, vy;
+      if (onLoop) {
+        const sp = (130 + Math.random() * 110) * k, a = (Math.random() - .5) * .9 * k, ca = Math.cos(a), sa = Math.sin(a);
+        vx = (dirx * ca - diry * sa) * sp; vy = (dirx * sa + diry * ca) * sp;
+      } else {
+        vx = (facing * (20 + Math.random() * 70) + (Math.random() - .5) * 90) * k;
+        vy = -(150 + Math.random() * 140) * k;
+      }
+      const spin = (Math.random() - .5) * 640 * k, kfs = [];
+      let j = 0;
+      for (const tt of [0, .16, .33, .49, .65])
+        kfs.push({ transform: `translate(calc(-50% + ${(vx * tt).toFixed(1)}px), calc(-50% + ${(vy * tt + 450 * tt * tt).toFixed(1)}px)) rotate(${(spin * tt).toFixed(0)}deg)`, opacity: [1, 1, .85, .4, 0][j++] });
+      b.animate(kfs, { duration: 550 + Math.random() * 200 }).onfinish = () => b.remove();
+    }
+    const p = document.createElement('i');
+    p.className = 'puff';
+    p.style.left = `${bx.toFixed(1)}px`; p.style.top = `${by.toFixed(1)}px`;
+    stage.appendChild(p);
+    p.animate([
+      { transform: `translate(-50%,-80%) scale(${burst ? .8 : .5})`, opacity: burst ? .7 : .5 },
+      { transform: `translate(-50%,-115%) scale(${burst ? 2 : 1.25})`, opacity: 0 }
+    ], { duration: burst ? 620 : 420, easing: 'ease-out' }).onfinish = () => p.remove();
+  }
+
   let cur = 0, last = performance.now(), prevX = 0, prevY = 0, lastGhost = 0, lastMove = performance.now(), wasAsleep = false;
   let braking = false;   // the runner halted at the end of the level and is playing the stop
   let rolling = null;    // rolling off the loop after standing on it too long: {from, to, t0, dur}
@@ -1279,6 +1325,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
   // Repeat runs the loop again by itself; back on the first screen, everything starts over.
   let P = 0, lastRaw = 0, auto = false;
   let finishing = null;   // the auto-played end of the cycle once the runner has scrolled off the left edge
+  let parkAt = null;      // after he rolls back down the loop: the scroll position to move past before the run resumes
+  let faceHold = null;    // facing kept after a back-roll, so standing at the loop's foot he does not snap-flip
   let bubbleDone = false; // the arrival bubble has been said this lap
   window.goingHome = false;   // the logo is taking the page to the very top: the loop's back-scroll shortcut stands down for the ride
   const AUTO_T = 3;   // seconds for a whole loop run by the Repeat button
@@ -1306,7 +1354,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
     // the level glides back to its start instead of jumping: the camera keeps where it was and eases home, and
     // this level's loop fades back in (he himself is below the screen's edge by now)
     glide = {x: camNow[0], y: camNow[1], t0: performance.now()};
-    P = cur = 0; auto = false; braking = false; slide = 0; rolling = null; finishing = null; bubbleDone = false;
+    P = cur = 0; auto = false; braking = false; slide = 0; rolling = null; finishing = null; bubbleDone = false; parkAt = null; faceHold = null;
   }
   function frame(now) {
     const real = Math.min(0.5, (now - last) / 1000), dt = Math.min(0.05, real); last = now;
@@ -1317,19 +1365,29 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const d = raw - lastRaw; lastRaw = raw;
     if (d < -0.0004 && raw > 0 && !window.goingHome) {   // back inside a lap: to the section's start
       scrollTo(0, loop.offsetTop); lastRaw = 0;
+      parkAt = null;
       if (P >= C1) loop.style.height = '100vh';   // the lap is done: the section collapses to one screen, no dead scroll on the way down
       finishing = null;   // the user takes the wheel back
     }
     else if (rolling) {   // rolling down the loop on his own: the scroll waits
       const u = Math.min(1, (now - rolling.t0) / rolling.dur), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(2 - 2 * u, 2) / 2;
       P = rolling.from + (rolling.to - rolling.from) * e;
-      if (u >= 1) { rolling = null; rolledAt = now; }
+      if (u >= 1) {
+        const back = rolling.to < rolling.from;
+        rolling = null; rolledAt = now;
+        if (back) { parkAt = lastRaw; faceHold = -1; }   // he gave up halfway: rebase the scroll from where it stopped, and keep him turned the way he slid until he moves again
+      }
     }
     else if (auto) { P = Math.min(1, P + real / AUTO_T); if (P >= 1) auto = false; }   // by the clock, even if frames drop
     else if (finishing) { /* the clock drives P to the end of the cycle */ }
-    else if (raw > wait) {
-      // the same constant pace the Repeat run has: the scroll only points the runner at his target, the tempo is the clock's
-      const target = Math.min(1, (raw - wait) / (1 - wait));
+    else if (raw > wait || parkAt !== null) {
+      // the same constant pace the Repeat run has: the scroll only points the runner at his target, the tempo is the clock's.
+      // after he rolled back down the loop, the scroll is rebased: wherever it sits, the first forward tick drives him from the loop's foot
+      let target;
+      if (parkAt !== null) {
+        if (raw <= parkAt + 0.0004) target = A1;   // the wheel has not moved forward from where it stopped: he stands at the loop's foot
+        else target = Math.min(1, A1 + (1 - A1) * (raw - parkAt) / (1 - parkAt));
+      } else target = Math.min(1, (raw - wait) / (1 - wait));
       if (P < target) P = Math.min(target, P + real / AUTO_T);   // forward only; after a bounce the gap just closes as the scroll catches up
     }
     if (P >= C1 && done < loopN) {
@@ -1367,12 +1425,14 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const camX = q.cam + (glide ? glide.x * gk : 0), camY = q.camY + (glide ? glide.y * gk : 0);
     camNow = [camX, camY];
     world.style.transform = `translate(${(-camX).toFixed(1)}px,${(-camY).toFixed(1)}px)`;
-    // rolling back down, he faces the way he slides; otherwise the way he runs
-    const facing = rolling && rolling.to < rolling.from ? -1 : 1;
+    // rolling back down, he faces the way he slides; otherwise the way he runs. A finished back-roll keeps that facing
+    // while he stands, so the pose does not snap-flip at the loop's foot (the hold clears once he moves — below, after v)
+    const facing = (rolling && rolling.to < rolling.from) ? -1 : (faceHold || 1);
     body.style.transform = `rotate(${(q.ang * 57.3).toFixed(1)}deg) scaleX(${facing})`;
 
     const vx = q.x - prevX, vy = q.y - prevY; prevX = q.x; prevY = q.y;
     const v = Math.hypot(vx, vy) / Math.max(dt, 0.001);
+    if (v > 25 || auto || finishing || (rolling && rolling.to > rolling.from)) faceHold = null;   // he is moving forward (or driven): no held facing
     distSm += (q.dist - distSm) * Math.min(1, dt * 10);   // smoothed travel for the stride cycle: starts and stops with the motion
 
     // running: the frame follows the distance; at the end of the level Chip brakes; standing still, he checks the time
@@ -1387,26 +1447,33 @@ h1 em{font-style:normal;color:var(--cobalt)}
     // layer order: text (10) < loop (30) < grass (40). The runner is in front on the roll-in; from the moment he steps
     // on the circle he stays behind the loop through the whole lap and the run-out, in front again only as the next lap begins
     runner.style.zIndex = (q.turn > 0 && q.lap === 1) ? 20 : 35;
-    bubble.style.setProperty('--bs', bubbleScale.toFixed(3));   // the whole bubble belongs to Chip: it scales with him
-    bubble.style.setProperty('--bx', Math.round(42 * bubbleScale) + 'px');
-    bubble.style.setProperty('--by', Math.round(187 * bubbleScale * Math.pow(GROW, sizeN - 1)) + 'px');   // Chip grows 20% every loop; the bubble rides up with him, scaled to his current size
+    // each footfall kicks the grass: a burst of blades and a puff
+    const mark = Math.floor(distSm / (RH * 0.44));
+    if (mark !== stepMark) { stepMark = mark; if (v > 70) spawnFoot(q, camX, camY, facing); }
+    const grown = Math.pow(GROW, sizeN - 1);   // Chip grows 20% every loop; the bubble rides up and to the right with him
+    bubble.style.setProperty('--bx', Math.round(42 * grown) + 'px');
+    bubble.style.setProperty('--by', Math.round(187 * grown) + 'px');
     const name = `LOOP ${String(q.lap === 2 ? loopN + 1 : loopN).padStart(2, '0')}`;
     if (tag.textContent !== name) tag.textContent = name;
-    // left standing on the loop for a while, he rolls off it: back down if he is less than halfway round, on to the
-    // exit if more. No running — he slides in braking pose 4, turned the way he goes, and turns with the loop
+    // left standing on the loop for a while, he rolls off it: back down if he is less than halfway round, on to
+    // the exit if more. No running — he slides in braking pose 4, turned the way he goes, and turns with the loop
     if (!rolling && !auto && idle && still > ROLL_AFTER && P > A1 + 0.001 && P < B1 - 0.001) {
       const ahead = q.turn > 0.5, to = ahead ? B1 : A1;
       rolling = {from: P, to, t0: now, dur: 600 + 1400 * Math.abs(to - P) / (B1 - A1)};
     }
     if (rolling) show('brake-4');
     else if (braking && still - STOP < BRAKE_T) show(brakeFrame(Math.min(1, 0.1 + Math.max(0, (still - STOP) / BRAKE_T) * 0.9)));   // the skid starts right as he arrives, no halt in between; from brake-2, whose anchor meets the run frames
-    else if (now - rolledAt < 500) show('idle-1');
+    else if (now - rolledAt < 650) show('idle-1');   // the grace must outlast the 0.6s run-frame window below, or a stray running stride pops in right after a roll
     // the legs follow the smoothed travel itself: planted feet at any pace, no after-motion treadmill, no wheel-burst jumps
     else if (!idle || still < 0.6) {
       runPhase = distSm / (RH * 0.11);
       show(RUN[Math.floor(runPhase) % RUN.length]);
     }
     else show(idleFrame(still));
+    // the skid digs in: twice the grass bursts out when the braking pose takes over
+    const inBrake = !rolling && braking && still - STOP < BRAKE_T;
+    if (inBrake && !wasBrakePose) spawnFoot(q, camX, camY, facing, true);
+    wasBrakePose = inBrake;
     // the Repeat run leaves a trail: a see-through copy of the robot every few hundredths of a second, fading out
     if (auto && !idle && now - lastGhost > 45) {
       lastGhost = now;
