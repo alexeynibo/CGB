@@ -21,7 +21,8 @@
   --pad-x:max(var(--pad), calc((100vw - var(--cw)) / 2));   /* past 1820 the column stays 1500, centred; the rest stretches */
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--paper);color:var(--ink)}
+html{background:var(--paper)}
+body{background:var(--paper);color:var(--ink)}
 body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 
 .hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;flex-direction:column;padding-top:88px}   /* the header is fixed: room for it at the top */
@@ -30,8 +31,11 @@ body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .hd{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:88px;padding:0 var(--pad-x);font:500 15px Inter,sans-serif}
 .hd nav{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:2px;height:50px;padding:0 8px;border-radius:999px;
   background:color-mix(in srgb,var(--paper) 80%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.hd nav span{padding:0 13px;height:38px;display:flex;align-items:center;border-radius:999px;white-space:nowrap;cursor:pointer;transition:background .2s}
-.hd nav span:hover{background:#fff}
+.hd nav span{padding:0 13px;height:38px;display:flex;align-items:center;border-radius:999px;white-space:nowrap;cursor:pointer;position:relative}
+.hd nav i.navhl{position:absolute;top:6px;left:0;width:0;height:38px;border-radius:999px;background:#fff;opacity:0;pointer-events:none;box-shadow:none;transform:none;z-index:-1;
+  transition:left .25s cubic-bezier(.3,.8,.4,1),width .25s cubic-bezier(.3,.8,.4,1),opacity .18s}
+.hd nav:hover i.navhl{opacity:1}
+.hd nav i.navhl.snap{transition:opacity .18s}   /* first show after the pointer returns: land on the spot, don't ride from the old one */
 .burger{display:none;position:absolute;left:50%;transform:translateX(-50%);width:50px;height:50px;border-radius:999px;
   background:color-mix(in srgb,var(--paper) 80%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   flex-direction:column;align-items:center;justify-content:center;gap:5px}
@@ -48,20 +52,22 @@ body{font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 #pl{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .5s}
 #pl.off{opacity:0;pointer-events:none}
 .pl-circle{position:relative;width:160px;height:160px;border-radius:50%;background:#fff;overflow:hidden;animation:pl-breathe 2.8s ease-in-out infinite alternate}
-@keyframes pl-breathe{from{width:160px;height:160px}to{width:180px;height:180px}}
+@keyframes pl-breathe{from{transform:scale(1)}to{transform:scale(1.125)}}   /* transform, not size: the label below must not ride up and down with the circle */
 .pl-runner{position:absolute;left:50%;top:50%;width:58.1px;height:83px;transform:translate(calc(-50% - 2px),calc(-50% - 1px));background:url(assets/character/chip/run-sheet.webp) 0 0/auto 83px no-repeat;animation:pl-run .533s steps(16) infinite}
 @keyframes pl-run{to{background-position-x:-929.6px}}
 .pl-label{font:500 14px/1 Inter,sans-serif;color:var(--ink-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
 
 /* left column */
 .copy{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad-x) clamp(40px,7vh,88px);width:72%}   /* may run over the stream: the players stay behind the text */
-h1{white-space:nowrap;font:800 clamp(52px,6.3vw,118px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.04em}
+h1{white-space:nowrap;font:800 clamp(52px,6.3vw,118px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.04em;
+  margin-left:-.04em}   /* optical: the round G and the tight tracking read as indented next to the straight edges of the column and the buttons */
 h1 em{font-style:normal;color:var(--cobalt)}
 .lead{margin-top:clamp(24px,4vh,40px);max-width:30em;font-size:clamp(17px,1.3vw,21px);line-height:1.5;color:var(--ink-2)}
-.btns{margin-top:32px;display:flex;gap:12px;flex-wrap:wrap}
+.btns{margin-top:32px;margin-left:-6px;display:flex;gap:12px;flex-wrap:wrap}   /* optical: the rounded pill edge plus the C make the row read as indented */
 .btn{height:56px;padding:0 28px;border-radius:999px;display:inline-flex;align-items:center;font:600 16px Inter,sans-serif;white-space:nowrap}
 .btn.primary{background:var(--cobalt);color:#fff}
 .btn.ghost::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1.5px rgba(13,16,23,.22);pointer-events:none;z-index:2}
+.btn.ghost:hover::after{box-shadow:inset 0 0 0 1.5px rgba(13,16,23,.1)}   /* the outline softens as the white fill comes in */
 
 /* button hovers: the filled ones brighten and carry a radial glow under the cursor;
    the ghost one fills with a white circle that grows from where the cursor enters and
@@ -71,10 +77,11 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .btn.primary:hover{background:#3D5BFF}
 .hd .cta:hover{background:#262C3D}
 .glow{position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .3s;pointer-events:none;
-  background:radial-gradient(circle 120px at var(--mx,50%) var(--my,50%),rgba(126,208,255,.6),rgba(126,208,255,0) 70%)}
+  background:radial-gradient(circle 120px at var(--mx,50%) var(--my,50%),rgba(var(--glowRGB,0,142,255),.6),rgba(var(--glowRGB,0,142,255),0) 70%)}
 .btn.primary:hover .glow,.hd .cta:hover .glow{opacity:1}
-.lbl{position:relative;z-index:1;transition:opacity .18s}
-.mq{position:absolute;inset:0;z-index:1;display:flex;align-items:center;overflow:hidden;opacity:0;transition:opacity .18s;pointer-events:none}
+.hd .cta .glow{background:radial-gradient(circle 120px at var(--mx,50%) var(--my,50%),rgba(255,255,255,.32),rgba(255,255,255,0) 70%)}   /* the black button warms grey under the cursor, not blue */
+.lbl{position:relative;z-index:1;transition:opacity .18s;transform:translateY(1px)}   /* optical: lowercase sits on the baseline, so centred text reads high by ~1px */
+.mq{position:absolute;inset:0;z-index:1;display:flex;align-items:center;overflow:hidden;opacity:0;transition:opacity .18s;pointer-events:none;transform:translateY(1px)}
 .btn .mq{padding-left:28px}
 .hd .cta .mq{padding-left:20px}
 .plate .again .mq{padding-left:16px}
@@ -88,7 +95,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 @keyframes mq{to{transform:translateX(-50%)}}
 .btn.ghost .fill{position:absolute;left:0;top:0;width:300px;height:300px;border-radius:50%;background:#fff;
   z-index:1;pointer-events:none;transform:translate(-50%,-50%) scale(0)}
-.btn.ghost>span{position:relative;z-index:1}
+.btn.ghost>span{position:relative;z-index:1;transform:translateY(1px)}
 
 /* ---------- the stream: a crowd of players rising; rewards pop up inside it ---------- */
 /* the box is 140 px wider on each side than the area the objects are placed in: the bottom fade (a mask)
@@ -116,6 +123,12 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .spark{position:absolute;left:0;top:0;width:7px;height:12px;border-radius:2px;margin:-6px 0 0 -3.5px}
 .spark.round{width:8px;height:8px;border-radius:50%;margin:-4px 0 0 -4px}
 
+/* ---------- the haze: pale solid circles rising behind the stream, the same fountain, no faces ---------- */
+.haze{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 92%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 0,#000 92%,transparent 100%)}
+.haze i{position:absolute;left:0;top:0;border-radius:50%;will-change:transform,opacity}
+
 @media (max-width:1100px){ .hd nav{display:none} }
 @media (max-width:820px){
   .copy{width:auto;justify-content:flex-start;padding-top:112px}
@@ -126,9 +139,10 @@ h1 em{font-style:normal;color:var(--cobalt)}
    The stage sticks to the screen while you scroll. The runner rolls into a big loop-the-loop on the right,
    goes round it with the scroll and passes five points inside it; each point drops its card onto a stack
    on the left. Then the screen moves right: this loop slides away, the next one comes in. */
-.loop{position:relative;height:540vh;overflow-x:clip}   /* margin-top is set by the script: room for the top of the loop */
+.loop{position:relative;height:540vh;overflow-x:clip}   /* margin-top is set by the script: room for the top of the loop; the bottom gap shows the ground's fade-out band */
 /* the stage is cut at the sides and the bottom only: on the way in, the top of the loop shows above it */
-.loop .stage{position:sticky;top:0;height:100vh;height:100svh;clip-path:inset(-100vh 0 0 0)}
+.loop .stage{position:sticky;top:0;height:100vh;height:100svh;clip-path:inset(-100vh 0 0 0);
+  background:linear-gradient(to bottom,var(--paper) 38%,#FFFFFF 100%)}   /* the warm-to-white gradient lives only on the loop screen; everywhere else the paper stays solid */
 .run-head{position:absolute;left:var(--pad-x);top:clamp(72px,13vh,160px);z-index:9}   /* the text is over the level */
 .loop h2{white-space:nowrap;font:800 clamp(48px,5.44vw,104px)/.95 "Bricolage Grotesque",sans-serif;font-variation-settings:"opsz" 96;letter-spacing:-.045em}
 .loop h2 em{font-style:normal;color:var(--cobalt)}
@@ -136,10 +150,12 @@ h1 em{font-style:normal;color:var(--cobalt)}
 /* the world moves under the camera */
 .world{position:absolute;left:0;top:0;z-index:5;will-change:transform}
 .level-art{position:absolute;left:0;top:0;display:block;pointer-events:none}
-.ground-strip{position:absolute;left:0;top:0;display:flex}
+.ground-strip{position:absolute;left:0;top:0;display:flex;z-index:40}
 .ground-strip img{display:block;flex:none}
 .ground-strip img:nth-child(even){transform:scaleX(-1)}   /* mirrored copies join without a seam */
-.ground-fill{position:absolute;left:0;background:#DAD2C2}  /* the colour the painted earth fades into at its bottom */
+.ground-fill{position:absolute;left:0;background:var(--paper)}
+.ground-soil{position:absolute;left:0;background:#E3DECE}   /* continues the soil colour from the strip's bottom edge to the foot of the stage, so no light gap shows before the blue band */
+.band{height:100px;background:linear-gradient(to bottom,#E3DECE,transparent)}   /* the ground's colour dissolves into the next section's background */
 /* the level's name at its start, level with the runner's shoulder: LOOP 01, and LOOP 02 at the next one.
    Set like the label on the cards */
 .loop-tag{position:absolute;left:var(--pad-x);top:0;z-index:9;transform:translateY(-50%);white-space:nowrap;
@@ -164,7 +180,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 
 /* the cards stack up in one place under the title */
 /* pulled left by the card's own padding, so its text lines up with the title (the white edge hangs outside) */
-.stack{--in:clamp(26px,2vw,40px);position:absolute;left:calc(var(--pad-x) - var(--in));z-index:7;width:clamp(340px,29vw,540px)}
+.stack{--in:clamp(26px,2vw,40px);position:absolute;left:calc(var(--pad-x) - var(--in));z-index:4;width:clamp(340px,29vw,540px)}   /* below the world (5): the runner passes in front of the cards */
 /* the same inset on every side; the cards are made as tall as the tallest and the last line keeps to the bottom */
 .plate{position:absolute;left:0;top:0;width:100%;padding:var(--in);display:flex;flex-direction:column;border-radius:24px;background:#fff;
   box-shadow:0 28px 60px -32px rgba(13,16,23,.3);transform-origin:50% 100%;
@@ -201,9 +217,14 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .plate .again svg{width:18px;height:18px;transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
 .plate .again:hover svg{transform:rotate(-200deg)}
 .plate.next p{color:rgba(255,255,255,.82);margin-bottom:20px}
-/* the chip that flies up from Chip as he passes a stage */
-.fly{position:absolute;z-index:10;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;
+/* the chip that flies up from Chip as he passes a stage; over the loop art (30), under the ground strip (40) */
+.fly{position:absolute;z-index:32;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;
   box-shadow:0 14px 30px -12px rgba(13,16,23,.32);white-space:nowrap;pointer-events:none;opacity:0}
+.bubble{position:absolute;left:calc(50% + var(--bx,42px));bottom:calc(100% + var(--by,187px));transform:translateY(8px) scale(.92);transform-origin:var(--tailx,10%) 100%;background:#fff;border-radius:18px;padding:19px 29px;font:600 18px/1.35 Inter,sans-serif;color:var(--ink);white-space:normal;width:max-content;max-width:300px;box-shadow:0 14px 30px -10px rgba(13,16,23,.3);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;z-index:5;box-sizing:border-box}
+.bubble::after{content:'';position:absolute;left:var(--tailx,10%);top:calc(100% - 1px);border:8px solid transparent;border-top:16px solid #fff;transform:rotate(16deg);transform-origin:50% 0;filter:drop-shadow(0 3px 2px rgba(13,16,23,.12))}
+.bubble.below{bottom:auto;top:calc(100% + var(--by,187px))}
+.bubble.below::after{top:auto;bottom:calc(100% - 1px);border-top:0;border-bottom:16px solid #fff;transform:rotate(-16deg)}
+.bubble.on{opacity:1;transform:translateY(0) scale(1)}
 .fly b{font:800 clamp(20px,1.4vw,26px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em;color:#13A86B;font-variant-numeric:tabular-nums}
 .fly span{font:500 clamp(13px,.85vw,15px)/1.2 Inter,sans-serif;color:var(--ink-3)}
 
@@ -249,6 +270,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .aim.on{transform:translate(-50%,-50%) scale(1)}
 .aim::before{content:"";position:absolute;left:50%;top:50%;width:22%;height:22%;border-right:3px solid var(--cobalt);border-top:3px solid var(--cobalt);
   transform:translate(-65%,-50%) rotate(45deg)}
+.aim.rev::before{transform:translate(-35%,-50%) rotate(-135deg)}   /* the left zone points the chevron the other way */
 .track.aiming,.track.aiming *{cursor:none}
 
 /* the cases stand round a circle, seen from inside it: the whole row is cut by two arcs across the full width — the
@@ -266,6 +288,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
   container-type:inline-size;   /* the text inside is sized by the card's own width (cqw), so smaller cards keep it in proportion */
   overflow:hidden;color:#fff;text-decoration:none;
   background:radial-gradient(110% 80% at 75% 15%,var(--a1),var(--a2) 70%);
+  --shade:color-mix(in srgb,var(--a2) 45%,#0B0D14);   /* the foot darkens to the case's own brand colour, not black */
 }
 /* soft light and a darker foot under the text */
 .case::before{content:"";position:absolute;inset:0;z-index:-1;
@@ -280,7 +303,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 .case .key img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0;transition:transform .8s cubic-bezier(.2,.7,.3,1)}
 .track:not(.aiming) .case:hover .key img{transform:scale(1.05)}
 /* with key art the foot darkens earlier and deeper, so the text never sits on a busy part of the picture */
-.case.keyed::before{background:linear-gradient(to bottom,transparent 36%,color-mix(in srgb,var(--foot,#080C26) 72%,transparent) 60%,color-mix(in srgb,var(--foot,#080C26) 88%,transparent))}
+.case.keyed::before{background:linear-gradient(to bottom,transparent 36%,color-mix(in srgb,var(--shade) 72%,transparent) 60%,color-mix(in srgb,var(--shade) 88%,transparent))}
 .case .top{position:absolute;left:clamp(14px,6.5cqw,34px);right:clamp(14px,6.5cqw,34px);top:calc(clamp(14px,6.5cqw,34px) + 9%);   /* clear of the arc */
   display:flex;justify-content:flex-end;align-items:center}
 .chip{padding:8px 12px;border-radius:999px;background:rgba(13,16,23,.2);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
@@ -385,7 +408,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
     ...[1, 2, 3, 4, 5].map(i => `assets/character/chip/idle-${i}.webp?v=3`),
     ...[1, 2, 3, 4, 5, 6].map(i => `assets/character/chip/brake-${i}.webp?v=3`),
     'assets/character/chip/sleep.webp?v=3',
-    'assets/level/loop-flat.webp', 'assets/level/ground-flat.webp',
+    'assets/level/loop-flat.webp', 'assets/level/ground-flat.webp?v=12',
     'assets/rewards/final-v4/gem.webp', 'assets/rewards/final-v4/coin.webp', 'assets/rewards/final-v4/star.webp',
     'assets/rewards/final-v4/heart.webp', 'assets/rewards/final-v4/bolt.webp'
   ];
@@ -425,6 +448,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
     <div class="hd-r"><div class="lang"><span>EN</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div><div class="cta"><i class="glow"></i><span class="lbl">Contact us</span><span class="mq"><span class="mq-in"><span class="mq-t">Contact us to talk strategy</span><span class="mq-t" aria-hidden="true">Contact us to talk strategy</span></span></span></div></div>
   </header>
 
+  <div class="haze" id="haze" aria-hidden="true"></div>
+
   <div class="copy">
     <h1>Growth is a&nbsp;game.<br><em>We know how<br>to&nbsp;win&nbsp;it.</em></h1>
     <p class="lead">Full-cycle marketing for mobile games. Analytics, strategy and user acquisition that grow your game&nbsp;— in&nbsp;the US, Europe&nbsp;and&nbsp;Asia.</p>
@@ -444,14 +469,18 @@ h1 em{font-style:normal;color:var(--cobalt)}
       <p>Your game, our loop. We&nbsp;take every turn with you and come out of&nbsp;each round stronger.</p>
     </div>
     <div class="stack" id="stack"></div>
-    <div class="world" id="world"></div>
-    <div class="runner" id="runner">
-      <div class="body" id="runBody">
-        <div class="robot" id="robot"></div>
+    <div class="world" id="world">
+      <div class="runner" id="runner">
+        <div class="bubble" id="bubble"></div>
+        <div class="body" id="runBody">
+          <div class="robot" id="robot"></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
+
+<div class="band"></div>
 
 <section class="cases" id="cases">
   <div class="cases-head">
@@ -541,7 +570,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
   const PHOTO_SHARE = 0.45;
   const slug = name => name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace('-', '');
   const NOT_OLD = ['Lukas', 'Camille', 'Haoran', 'Ana', 'Diego', 'Zoe', 'Bao', 'Felix', 'Ravi', 'Wen', 'Hana', 'Victor',
-                   'Mateo', 'Chloé', 'Arjun', 'Nina'];
+                   'Mateo', 'Chloé', 'Arjun', 'Nina', 'Ji-woo'];
   const FUN = [['corgi', 'CorgiBoss', 'Leeds'], ['cat-ginger', 'GingerSnap', 'Lyon'], ['husky', 'SnowPaws', 'Anchorage'],
                ['cat-black', 'NightMeow', 'Riga'], ['parrot', 'PollyPlays', 'Rio'], ['pug', 'PugLife', 'Denver'],
                ['hamster', 'CheekyHam', 'Utrecht'], ['shiba', 'DogeRun', 'Nagoya'], ['rabbit', 'HopHop', 'Gdańsk'],
@@ -555,7 +584,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
   const PHOTOS = [...PLAYERS.map(([name, city]) => ({name, city, src: `assets/avatars/v2/${slug(name)}.jpg`})),
                   ...FUN.map(([file, name, city]) => ({name, city, src: `assets/avatars/fun/${file}.jpg`})),
                   ...PLAYERS.filter(([name]) => !NOT_OLD.includes(name))
-                            .map(([name, city]) => ({name, city, src: `assets/avatars/${slug(name)}.jpg`}))];
+                            .map(([name, city]) => ({name, city, src: `assets/avatars/${slug(name)}.jpg`})),
+                  {name: 'Igor', city: 'Paris', src: 'assets/avatars/igor.jpg'}];
   PHOTOS.forEach(ph => {
     ph.c = '#8A8F99';
     const i = new Image();
@@ -971,8 +1001,10 @@ h1 em{font-style:normal;color:var(--cobalt)}
   }
 
   // ---- painted level: two loops (this one and the next), the ground strip in front of them ----
-  const LOOP_ART = {src: 'assets/level/loop-flat.webp', w: 1100, h: 1110, cx: 558, cy: 532, run: 432};  // centre and running radius, px in the picture
-  const GROUND_ART = {src: 'assets/level/ground-flat.webp', w: 1916, h: 380, run: 106};                 // run: the line the runner rolls on
+  const LOOP_ART = {src: 'assets/level/loop-flat.webp?v=12', w: 1100, h: 1110, cx: 558, cy: 532, run: 432};  // centre and running radius, px in the picture
+  const TUNE = {scale: 0.9, dy: 30, ground: 40, rad: 1.11, font: 0.91, tdy: 0, tshift: 0};   // the approved fit from the tuning panel
+  const TRJ = {dx: 0, dy: -1, r: 0.92};   // the approved running circle from the trajectory panel
+  const GROUND_ART = {src: 'assets/level/ground-flat.webp?v=12', w: 1188, h: 236, run: 106};                 // run: the line the runner rolls on
   // each stage's label is a number and a name on their own textPaths, placed by measured widths: a dx on a
   // tspan inside a textPath is spaced inconsistently by Chromium once the svg carries a fractional viewBox
   // and transforms, so the number came loose from the name. start offsets in px, recomputed in build()
@@ -1004,6 +1036,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
   });
   const strip = document.createElement('div'); strip.className = 'ground-strip'; world.appendChild(strip);
   const fill = document.createElement('div'); fill.className = 'ground-fill'; world.appendChild(fill);
+  const soilExt = document.createElement('div'); soilExt.className = 'ground-soil'; world.appendChild(soilExt);
   // the level's name stays put on the screen, like the title and the cards; at the next level it reads LOOP 02
   const tag = document.createElement('div'); tag.className = 'loop-tag'; tag.textContent = 'LOOP 01'; stage.appendChild(tag);
 
@@ -1036,7 +1069,9 @@ h1 em{font-style:normal;color:var(--cobalt)}
 
   // ---- geometry, in screen pixels (rebuilt on resize) ----
   let W, H, GY, R, r, X0, LX, LX2, STEP = 36;
-  const RING = {size: 0.145, radius: 0.825};   // the names round the loop: font size and circle radius, as shares of the loop radius
+  let RC = 0, DY = 0, GLUE = 0, ROB_OFF = 0;   // the ring's circle: 76% of the old loop after the panel, dropped 94px (set in build); GLUE/ROB_OFF freeze the loop-to-ground fit at the 1440 geometry
+  const LINE_DY = 12;   // the straight track sits 12px below the old ground line (tracks panel)
+  const RING = {size: 0.120, radius: 0.8};   // the names round the loop: font size and circle radius, as shares of the loop radius (panel: 83% size, 80% radius)
   function build() {
     W = stage.clientWidth; H = stage.clientHeight;
     GY = H * 0.86;                              // the line the runner rolls on (just under the grass tips)
@@ -1053,13 +1088,20 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const inv = $('invite');
     if (inv) LX = Math.max(LX, inv.offsetLeft + inv.offsetWidth + R + 56);
     LX2 = LX + W * 1.2 + R;                     // the next loop
+    RC = R * 1.05 * 0.76; DY = 94;             // panel: circle 76%, centre 10px lower; the ring picture and text follow it
+    // the loop-to-ground fit is frozen at the 1440-wide geometry: at every window size the loop's bottom grass and the
+    // runner's circle keep constant offsets from the ground line — only their scale changes with the window, no drift
+    const RREF = 403.2;   // R at 1440 wide, the size the approved fit was tuned at
+    GLUE = DY + TUNE.dy - RREF * (1 - TUNE.scale);                                   // loop's bottom grass below GY
+    ROB_OFF = GLUE - RREF * TUNE.scale + TRJ.dy + (RREF * 1.05 * 0.76) * TRJ.r;      // runner's circle bottom below GY
+    const anchorY = GY + GLUE - R * TUNE.scale;                                      // the loop picture's centre on screen
     const pad = $('runHead').offsetLeft;
     // the level's name stands at the left edge of the text column, level with the shoulder of the standing runner,
     // who sets off just right of it. The next level's name is as far on as the next loop, so it comes in to the same place
     tag.style.top = `${GY - RH * 0.64 + 50}px`;
     X0 = pad + tag.offsetWidth + RH0 * 0.3 + r + 70;   // the same spot whatever his size, so growing does not move him
     // room above the section for the top of the loop: on the way in only a little of its top shows over the first screen
-    const over = Math.max(0, LOOP_ART.cy * R / LOOP_ART.run + R - GY);
+    const over = Math.max(0, LOOP_ART.cy * R / LOOP_ART.run + RC - GY);
     // (its plain outer rim, not the grass)
     loop.style.marginTop = `${Math.round(Math.max(0, over - R * 0.09))}px`;
     const end = LX2 + W;
@@ -1067,31 +1109,43 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const sl = R / LOOP_ART.run;
     loops.forEach((lp, k) => {
       const lx = k ? LX2 : LX;
-      lp.img.style.cssText = `width:${LOOP_ART.w * sl}px;left:${lx - LOOP_ART.cx * sl}px;top:${GY - R - LOOP_ART.cy * sl}px`;
-      // the names run along a circle inside the loop; going round the runner's way, the letters stand towards the middle
-      const fs = R * RING.size, rt = R * RING.radius;
-      lp.svg.style.cssText = `left:${lx - R}px;top:${GY - 2 * R}px;width:${2 * R}px;height:${2 * R}px;font-size:${fs}px`;
-      lp.svg.setAttribute('viewBox', `0 0 ${2 * R} ${2 * R}`);
-      lp.ring.setAttribute('d', `M${R},${R + rt}A${rt},${rt} 0 1 0 ${R},${R - rt}A${rt},${rt} 0 1 0 ${R},${R + rt}`);
-      // the labels keep to their points: the pair centred on it, the name after the number, 0.35em of air
-      // between them. the widths are read off the rendered text itself, so the optical size and the
+      const rs = sl * TUNE.scale;
+      lp.img.style.cssText = `width:${LOOP_ART.w * rs}px;left:${lx - LOOP_ART.cx * rs}px;top:${anchorY - LOOP_ART.cy * rs}px;z-index:30`;
+      // the names run along a circle centred on the ring picture itself, so they follow its scale and height;
+      // going round the runner's way, the letters stand towards the middle
+      const rcx = RC * TUNE.scale;
+      const ccx = lx, ccy = anchorY + TUNE.tdy;
+      const fs = rcx * RING.size * TUNE.font, rt = rcx * RING.radius * TUNE.rad;
+      lp.svg.style.cssText = `left:${ccx - rcx}px;top:${ccy - rcx}px;width:${2 * rcx}px;height:${2 * rcx}px;font-size:${fs}px;z-index:10`;
+      lp.svg.setAttribute('viewBox', `0 0 ${2 * rcx} ${2 * rcx}`);
+      lp.ring.setAttribute('d', `M${rcx},${rcx + rt}A${rt},${rt} 0 1 0 ${rcx},${rcx - rt}A${rt},${rt} 0 1 0 ${rcx},${rcx + rt}`);
+      // the items sit one after another with the same arc gap between them; the first item keeps its anchor,
+      // the rest flow from it. the widths are read off the rendered text itself, so the optical size and the
       // letter-spacing stay exact (a canvas measure is off by a few px, enough to show at the curve)
       const len = 2 * Math.PI * rt, air = 0.35 * fs;
-      lp.labels.forEach((lb, i) => {
+      const ws = lp.labels.map(lb => {
         const wN = lb.num.pale.getComputedTextLength(), wName = lb.name.pale.getComputedTextLength();
-        const nameAt = AT[i] * len + (wN + air + wName) / 2 - wName;
-        const numAt = nameAt - air - wN;
+        return { wN, wName, w: wN + air + wName };
+      });
+      const total = ws.reduce((s, o) => s + o.w, 0);
+      const gap = (len - total) / lp.labels.length;   // one equal gap between every pair of items, counting the wrap
+      let at = AT[0] * len - ws[0].w / 2 + TUNE.tshift;   // item 0's centre stays on its anchor; tshift turns the whole text round the circle
+      lp.labels.forEach((lb, i) => {
+        const numAt = at, nameAt = at + ws[i].wN + air;
         [lb.num.pale, lb.num.lit].forEach(tp => tp.setAttribute('startOffset', numAt.toFixed(1)));
         [lb.name.pale, lb.name.lit].forEach(tp => tp.setAttribute('startOffset', nameAt.toFixed(1)));
+        at += ws[i].w + gap;
       });
     });
-    const sg = sl * 0.65, tw = GROUND_ART.w * sg, th = GROUND_ART.h * sg;
+    const sg = sl * 0.65, tw = Math.ceil(GROUND_ART.w * sg), th = GROUND_ART.h * sg;   // integer tile width: fractional widths open half-pixel seams between tiles
     const need = Math.ceil((end + W) / tw) + 1;
     while (strip.children.length < need) { const i = document.createElement('img'); i.src = GROUND_ART.src; i.alt = ''; strip.appendChild(i); }
-    [...strip.children].forEach(i => { i.style.width = `${tw + 1}px`; i.style.height = `${th}px`; });   // 1 px overlap: rounding must never open a seam between tiles
-    strip.style.transform = `translate(${-W}px,${GY - GROUND_ART.run * sg}px)`;
-    const fy = GY - GROUND_ART.run * sg + th - 2;
-    fill.style.cssText = `left:${-W}px;top:${fy}px;width:${end + 2 * W}px;height:${H - fy + H}px`;   // deep enough for when the camera looks up
+    [...strip.children].forEach(i => { i.style.width = `${tw + 2}px`; i.style.height = `${th}px`; });   // 2 px overlap: rounding must never open a seam between tiles
+    const gnd = TUNE.ground;
+    strip.style.transform = `translate(${-W}px,${GY - GROUND_ART.run * sg + gnd}px)`;
+    const fy = GY - GROUND_ART.run * sg + th - 2 + gnd;
+    soilExt.style.cssText = `left:${-W}px;top:${fy}px;width:${end + 2 * W}px;height:${Math.max(0, H - fy)}px;z-index:39`;
+    fill.style.cssText = `left:${-W}px;top:${fy}px;width:${end + 2 * W}px;height:${H - fy + H}px;z-index:38`;   // deep enough for when the camera looks up
 
     runner.style.setProperty('--rh', `${RH}px`);
     const k = RH / ROBOT_H;
@@ -1139,10 +1193,12 @@ h1 em{font-style:normal;color:var(--cobalt)}
       const half = e.offsetWidth / 2;
       e.style.left = `${Math.max(half + 16, Math.min(W - half - 16, x))}px`;
       e.animate([
-        // pops out, floats straight up and fades out smoothly (no staged steps)
-        {transform: 'translate(-50%,calc(-50% - 0px)) scale(.4)', opacity: 0, easing: 'cubic-bezier(.3,1.6,.5,1)'},
-        {transform: 'translate(-50%,calc(-50% - 40px)) scale(1.08)', opacity: 1, offset: 0.12},
-        {transform: 'translate(-50%,calc(-50% - 300px)) scale(.95)', opacity: 0, easing: 'ease-out'}
+        // rises from the very first frame and fades out on the way, no dwelling at the spawn point
+        {transform: 'translate(-50%,calc(-50% + 10px)) scale(.55)', opacity: 0},
+        {transform: 'translate(-50%,calc(-50% - 50px)) scale(1)', opacity: 1, offset: 0.12, easing: 'cubic-bezier(.2,.7,.4,1)'},
+        // holds fully opaque for most of the flight, so the numbers stay readable; only the last stretch fades
+        {transform: 'translate(-50%,calc(-50% - 240px)) scale(.98)', opacity: 1, offset: 0.7},
+        {transform: 'translate(-50%,calc(-50% - 340px)) scale(.96)', opacity: 0, easing: 'ease-in'}
       ], {duration: 2000}).onfinish = () => e.remove();
     }, k * 160);
   }
@@ -1157,20 +1213,20 @@ h1 em{font-style:normal;color:var(--cobalt)}
 
   function progress() {
     const b = loop.getBoundingClientRect(), span = b.height - innerHeight;
-    return Math.max(0, Math.min(1, -b.top / span));
+    return span <= 0 ? 0 : Math.max(0, Math.min(1, -b.top / span));
   }
   const seg = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
 
   // where everything is for a given scroll position
   function pose(p) {
     let x, y, cam = 0, camY = 0, dist, turn = 0, lap = 1, ang = 0, hidden = false;
-    const cy = GY - R;
+    const cx = LX + TRJ.dx, cy = GY + ROB_OFF - RC * TRJ.r, rr = RC * TRJ.r;
     if (p < A1) {                       // roll in along the ground to the bottom of the loop
-      x = X0 + (LX - X0) * seg(p, A0, A1); y = GY; dist = x - X0;
+      x = X0 + (LX - X0) * seg(p, A0, A1); y = GY + LINE_DY; dist = x - X0;
     } else if (p < B1) {                // round the loop, on its inside
       turn = seg(p, A1, B1);
       const th = turn * Math.PI * 2;
-      x = LX + R * Math.sin(th); y = cy + R * Math.cos(th); dist = LX - X0 + R * th; ang = -th;   // feet on the inside of the loop
+      x = cx + rr * Math.sin(th); y = cy + rr * Math.cos(th); dist = LX - X0 + rr * th; ang = -th;   // feet on the inside of the loop
       // the camera chases the runner: not at all at the bottom of the loop, fully at the top
       const f = 0.5 - 0.5 * Math.cos(th);
       cam = f * (x - W * 0.62); camY = f * (y - H * 0.55);
@@ -1178,8 +1234,8 @@ h1 em{font-style:normal;color:var(--cobalt)}
       const u = seg(p, B1, C1);         // behind the left edge (that is where he levels up), then all but stops while
       // he runs back in from the left, so the next loop and the runner end up just where this level started
       const D = LX2 - LX, sm = t => t * t * (3 - 2 * t);
-      cam = D * (0.97 * sm(Math.min(1, u / 0.45)) + 0.03 * u);
-      x = LX + (D - LX + X0) * u; y = GY; dist = LX - X0 + R * Math.PI * 2 + (x - LX);
+      cam = D * (0.97 * sm(Math.min(1, u / 0.6)) + 0.03 * u);
+      x = LX + (D - LX + X0) * u; y = GY + LINE_DY; dist = LX - X0 + R * Math.PI * 2 + (x - LX);
       turn = 1; lap = u >= 1 ? 2 : 1; hidden = u >= 0.45;
     }
     // the loop just finished fades as it slides away, so it never runs over the title and the cards
@@ -1211,6 +1267,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
   let rolledAt = -1e9;   // when the last roll ended: he stands at once, no running step after it
   const ROLL_AFTER = 1.5; // seconds standing on the loop before he rolls off
   let slide = 0;         // while braking he skids on a little further; px, eased back when he runs again
+  let runPhase = 0, distSm = 0;   // smoothed travel and the stride-cycle phase: the legs follow the motion itself, so the feet stay planted at any scroll speed and stop when it stops
   // the screen comes in first, the runner after: he sets off only after a first stretch of scroll on the pinned
   // screen (WAIT, a share of the screen height). Until then the names in the loop turn with the scroll and come to
   // their places just as he starts
@@ -1219,34 +1276,65 @@ h1 em{font-style:normal;color:var(--cobalt)}
   // set to the start of the section (the pinned screen looks the same there), so the screen simply scrolls away.
   // Repeat runs the loop again by itself; back on the first screen, everything starts over.
   let P = 0, lastRaw = 0, auto = false;
+  let finishing = null;   // the auto-played end of the cycle once the runner has scrolled off the left edge
+  let bubbleDone = false; // the arrival bubble has been said this lap
+  window.goingHome = false;   // the logo is taking the page to the very top: the loop's back-scroll shortcut stands down for the ride
   const AUTO_T = 3;   // seconds for a whole loop run by the Repeat button
+  // what Chip says when he runs back in after a loop; random order, never the same line twice in a row
+  const PHRASES = ['I grew so much!', 'Level up. Again!', 'Growth looks good on me.', 'One more loop, stronger me.', 'I can feel the metrics rising.', 'Bigger, better, faster.', "That's how I grow.", 'New loop, new me.', 'Still growing!', "What a run — let's grow more."];
+  let lastPhrase = -1, bubbleTimer = 0;
+  const bubble = document.getElementById('bubble');
+  function sayBubble() {
+    let i; do { i = Math.floor(Math.random() * PHRASES.length); } while (i === lastPhrase);
+    lastPhrase = i;
+    bubble.textContent = PHRASES[i];
+    bubble.classList.add('on');
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(() => bubble.classList.remove('on'), 3400);
+  }
   function repeat() {
     if (loopN >= MAX_LOOPS) return;
     loopN++; setNext();
-    P = cur = 0; auto = true; braking = false; slide = 0; rolling = null;
+    P = cur = 0; auto = true; braking = false; slide = 0; rolling = null; finishing = null; bubbleDone = false;
+    scrollTo(0, loop.offsetTop);   // the same spot manual scrolling drives the run from
   }
   function restart() {
     loopN = done + 1; sizeN = Math.min(loopN, MAX_LOOPS); setNext(); build();
+    loop.style.height = '';   // a full screen again: the scroll has room to drive the run
     // the level glides back to its start instead of jumping: the camera keeps where it was and eases home, and
     // this level's loop fades back in (he himself is below the screen's edge by now)
     glide = {x: camNow[0], y: camNow[1], t0: performance.now()};
-    P = cur = 0; auto = false; braking = false; slide = 0; rolling = null;
+    P = cur = 0; auto = false; braking = false; slide = 0; rolling = null; finishing = null; bubbleDone = false;
   }
   function frame(now) {
     const real = Math.min(0.5, (now - last) / 1000), dt = Math.min(0.05, real); last = now;
     const raw = progress(), lt = loop.getBoundingClientRect().top;
-    if (lt > H * 0.6 && (P > 0 || auto)) restart();
-    const span = loop.offsetHeight - innerHeight, wait = WAIT * innerHeight / span;
+    if (window.goingHome && lt >= 0) window.goingHome = false;   // above the loop section the back-scroll shortcut cannot fire anyway
+    if (lt >= H - 4 && (P > 0 || auto)) restart();   // only at the very top of the page the run resets: the Repeat card clears and scrolling runs the loop again
+    const span = loop.offsetHeight - innerHeight, wait = span > 0 ? WAIT * innerHeight / span : 1;
     const d = raw - lastRaw; lastRaw = raw;
-    if (d < -0.0004 && raw > 0) { scrollTo(0, loop.offsetTop); lastRaw = 0; }
+    if (d < -0.0004 && raw > 0 && !window.goingHome) {   // back inside a lap: to the section's start
+      scrollTo(0, loop.offsetTop); lastRaw = 0;
+      if (P >= C1) loop.style.height = '100vh';   // the lap is done: the section collapses to one screen, no dead scroll on the way down
+      finishing = null;   // the user takes the wheel back
+    }
     else if (rolling) {   // rolling down the loop on his own: the scroll waits
       const u = Math.min(1, (now - rolling.t0) / rolling.dur), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(2 - 2 * u, 2) / 2;
       P = rolling.from + (rolling.to - rolling.from) * e;
       if (u >= 1) { rolling = null; rolledAt = now; }
     }
     else if (auto) { P = Math.min(1, P + real / AUTO_T); if (P >= 1) auto = false; }   // by the clock, even if frames drop
-    else if (d > 0) P = P === 0 ? Math.max(0, (raw - wait) / (1 - wait)) : Math.min(1, P + d / (1 - wait));
-    if (P >= C1 && done < loopN) done = loopN;   // he is at the next level
+    else if (finishing) { /* the clock drives P to the end of the cycle */ }
+    else if (raw > wait) {
+      // the same constant pace the Repeat run has: the scroll only points the runner at his target, the tempo is the clock's
+      const target = Math.min(1, (raw - wait) / (1 - wait));
+      if (P < target) P = Math.min(target, P + real / AUTO_T);   // forward only; after a bounce the gap just closes as the scroll catches up
+    }
+    if (P >= C1 && done < loopN) {
+      done = loopN;   // he is at the next level
+      loop.style.height = '100vh';   // the lap is done: no dead scroll leaving the loop screen. the stage is pinned at the section's top, so pinning the scroll there too changes nothing visually
+      scrollTo(0, loop.offsetTop);
+    }
     // before the first start: the names turn with the scroll, from the moment the section comes up to the moment he runs
     const before = P === 0 && !auto;
     const left = before ? Math.max(0, lt) + Math.max(0, wait - raw) * span : 0;   // px of scroll still to go to the start
@@ -1257,6 +1345,19 @@ h1 em{font-style:normal;color:var(--cobalt)}
     cur += (target - cur) * Math.min(1, dt * 12);
     if (rolling || now - rolledAt < 500) cur = target;   // the roll itself is already smooth
     if (Math.abs(target - cur) < 0.0003) cur = target;
+    // once the runner has scrolled off the left edge, the rest of the cycle plays by itself, at the Repeat run's pace and with its own braking
+    if (!finishing && !auto && !rolling && d > 0 && cur > B1 && cur < C1 && seg(cur, B1, C1) >= 0.35) {
+      finishing = true;
+      setTimeout(sayBubble, 350);   // he says something on the way in
+    }
+    if (finishing) {   // the rest of the cycle plays itself — the very same constant-pace run the Repeat button drives
+      P = cur = Math.min(C1, P + (C1 - B1) * real / (AUTO_T * 0.5));
+      if (P >= C1) { finishing = null; rolledAt = now; }
+    }
+    if (auto && !bubbleDone && cur > B1 && seg(cur, B1, C1) >= 0.35) {   // the Repeat run says something on the way in too
+      bubbleDone = true;
+      setTimeout(sayBubble, 350);
+    }
     const q = pose(cur);
 
     let gk = 0;   // how much of the glide home is still to go, 1..0
@@ -1270,6 +1371,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
 
     const vx = q.x - prevX, vy = q.y - prevY; prevX = q.x; prevY = q.y;
     const v = Math.hypot(vx, vy) / Math.max(dt, 0.001);
+    distSm += (q.dist - distSm) * Math.min(1, dt * 10);   // smoothed travel for the stride cycle: starts and stops with the motion
 
     // running: the frame follows the distance; at the end of the level Chip brakes; standing still, he checks the time
     // a few times, gets bored, dozes off
@@ -1277,9 +1379,13 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const still = (now - lastMove) / 1000;   // seconds without moving, by the clock
     const idle = still > STOP;   // a pause between wheel steps is not standing still
     if (!idle) braking = q.lap === 2;   // running into the end of the level: when he halts there, he brakes
-    if (idle && braking) { const u = Math.min(1, (still - STOP) / BRAKE_T); slide = RH * 0.35 * (1 - Math.pow(1 - u, 3)); }
+    if (braking) { const u = Math.max(0, Math.min(1, (still - STOP) / BRAKE_T)); slide = RH * 0.35 * (1 - Math.pow(1 - u, 3)); }
     else if (!idle) slide += (0 - slide) * Math.min(1, dt * 6);
-    runner.style.transform = `translate(${(q.x - camX + slide).toFixed(1)}px,${(q.y - camY).toFixed(1)}px)`;
+    runner.style.transform = `translate(${(q.x + slide).toFixed(1)}px,${q.y.toFixed(1)}px)`;   // the world carries the camera, the runner only its own spot
+    // layer order: text (10) < loop (30) < grass (40). The runner is in front on the roll-in; from the moment he steps
+    // on the circle he stays behind the loop through the whole lap and the run-out, in front again only as the next lap begins
+    runner.style.zIndex = (q.turn > 0 && q.lap === 1) ? 20 : 35;
+    bubble.style.setProperty('--by', Math.round(187 * Math.pow(GROW, sizeN - 1)) + 'px');   // Chip grows 20% every loop; the bubble rides up with him
     const name = `LOOP ${String(q.lap === 2 ? loopN + 1 : loopN).padStart(2, '0')}`;
     if (tag.textContent !== name) tag.textContent = name;
     // left standing on the loop for a while, he rolls off it: back down if he is less than halfway round, on to the
@@ -1289,10 +1395,13 @@ h1 em{font-style:normal;color:var(--cobalt)}
       rolling = {from: P, to, t0: now, dur: 600 + 1400 * Math.abs(to - P) / (B1 - A1)};
     }
     if (rolling) show('brake-4');
+    else if (braking && still - STOP < BRAKE_T) show(brakeFrame(Math.min(1, 0.1 + Math.max(0, (still - STOP) / BRAKE_T) * 0.9)));   // the skid starts right as he arrives, no halt in between; from brake-2, whose anchor meets the run frames
     else if (now - rolledAt < 500) show('idle-1');
-    else if (idle && braking && still - STOP < BRAKE_T) show(brakeFrame((still - STOP) / BRAKE_T));
-    // (on the fast Repeat run the legs keep their own pace, by the clock, or the frames would flicker)
-    else if (!idle) show(RUN[(auto ? Math.floor(now / 33) : Math.floor(q.dist / (RH * 0.11))) % RUN.length]);
+    // the legs follow the smoothed travel itself: planted feet at any pace, no after-motion treadmill, no wheel-burst jumps
+    else if (!idle || still < 0.6) {
+      runPhase = distSm / (RH * 0.11);
+      show(RUN[Math.floor(runPhase) % RUN.length]);
+    }
     else show(idleFrame(still));
     // the Repeat run leaves a trail: a see-through copy of the robot every few hundredths of a second, fading out
     if (auto && !idle && now - lastGhost > 45) {
@@ -1327,8 +1436,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const lift = idle && TORSO[shown] ? head.style.transform : '';
     burn.forEach(g => { g.style.opacity = (1 - depth * gp * 0.3).toFixed(3); });
     [...halo, core, ...burn].forEach(g => { g.style.transform = lift; });
-    const fade = (1 - q.gone).toFixed(2);
-    loops[0].img.style.opacity = loops[0].svg.style.opacity = (fade * (1 - gk)).toFixed(2);
+    loops[0].img.style.opacity = loops[0].svg.style.opacity = (1 - gk).toFixed(2);   // no fade on the way out: the loop stays solid as he runs off it
     loops[0].pie.setAttribute('d', pie(q.turn)); loops[1].pie.setAttribute('d', pie(0));
 
     let flown = 0;   // chips sent off this frame, so several at once go one after another
@@ -1464,15 +1572,21 @@ h1 em{font-style:normal;color:var(--cobalt)}
     const above = track.getBoundingClientRect().top - cases.getBoundingClientRect().top;
     track.style.setProperty('--wmax', `${Math.max(220, (innerHeight - above - 32) * 4 / 5.6)}px`);
   }
-  // the arrow button: shown while the cursor is over the right part of the row, it eases after the cursor
-  let aimOn = false, ax = 0, ay = 0, tx = 0, ty = 0, dragged = false;
-  function setAim(on) { aimOn = on; aim.classList.toggle('on', on); track.classList.toggle('aiming', on); }
+  // the arrow buttons: shown while the cursor is over the thin zones at either edge of the row; the right one steps
+  // forward, the left one back; each eases after the cursor
+  let aimOn = false, aimDir = 1, ax = 0, ay = 0, tx = 0, ty = 0, dragged = false;
+  function setAim(on, dir) {
+    if (on) aimDir = dir;
+    aimOn = on;
+    aim.classList.toggle('on', on);
+    aim.classList.toggle('rev', aimDir < 0);
+    track.classList.toggle('aiming', on);
+  }
   track.addEventListener('pointermove', ev => {
     if (ev.pointerType !== 'mouse') return;
     tx = ev.clientX; ty = ev.clientY;
-    const on = tx > innerWidth * 0.78;   // the right fifth of the screen or so
-    if (on && !aimOn) { ax = tx; ay = ty; }
-    if (on !== aimOn) setAim(on);
+    const dir = tx > innerWidth * 0.89 ? 1 : tx < innerWidth * 0.11 ? -1 : 0;   // ~11% zones at both edges
+    if ((dir !== 0) !== aimOn) { if (dir !== 0) { ax = tx; ay = ty; } setAim(dir !== 0, dir); }
   });
   track.addEventListener('pointerleave', () => setAim(false));
   (function follow() {
@@ -1482,7 +1596,7 @@ h1 em{font-style:normal;color:var(--cobalt)}
   })();
   track.addEventListener('click', () => {
     if (!aimOn || dragged) return;
-    track.scrollBy({left: step(), behavior: 'smooth'});
+    track.scrollBy({left: step() * aimDir, behavior: 'smooth'});
   });
   // the two arcs that cut the row: a mask drawn to the row's size, reaching 8% into the cards in the middle
   function arc() {
@@ -1594,8 +1708,115 @@ h1 em{font-style:normal;color:var(--cobalt)}
 })();
 </script>
 <script>
-// the logo takes you back to the first screen
-document.querySelector('.logo').addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+// the pale circles behind the hero stream: the same fountain rise (narrow at the bottom, swaying on the way up),
+// just quiet solid dots tinted a little off the paper — warm, cool, or lighter, never far from the background.
+// They keep to a narrower band on the stream's side of the screen and never touch: a newcomer takes a spot
+// only if its whole sway fits clear of everybody else
+(() => {
+  const box = document.getElementById('haze');
+  if (!box) return;
+  const SPEED = 64, EMIT = 1.04, OPEN = 0.46;   // a touch faster than the stream (53), same shape
+  const COUNT = 60;                             // as many as the narrow band fits without touching
+  const GAP = 18;                               // clear air between circle edges, sway included
+  const X0 = 0.58, X1 = 0.985;                  // the band they live in: a narrower stream, right of the middle
+  const WARM = '#D9D1BC', COOL = '#D3D7DB', SAND = '#D6CCB2';
+  const CENTER = (X0 + X1) / 2;                 // the fountain's mouth sits mid-band
+  let W = 0, H = 0, dots = [];
+  const size = () => { W = box.clientWidth; H = box.clientHeight; };
+  size();
+  window.addEventListener('resize', size);
+  const spread = y => {
+    const t = Math.max(0, Math.min(1, (H * EMIT - y) / (H * (EMIT - OPEN))));
+    return 0.12 + 0.88 * (1 - Math.pow(1 - t, 2.2));
+  };
+  const fx = (x, y) => W * CENTER + (x - W * CENTER) * spread(y);
+  const tint = () => {
+    const c = [WARM, COOL, SAND][Math.floor(Math.random() * 3)], p = 12 + Math.random() * 18;
+    return `color-mix(in srgb,#F7F4EC ${100 - p}%,${c} ${p}%)`;   // always a touch darker than the paper, in three neighbouring hues
+  };
+  // a spot is free if the whole sway (amp) plus GAP stays clear of every neighbour — sway never lets them touch
+  function fits(x, y, r, amp) {
+    for (const d of dots) {
+      if (Math.abs(d.y - y) > 300) continue;
+      if (Math.hypot(d.x - x, d.y - y) < (d.r + d.amp) + (r + amp) + GAP) return false;
+    }
+    return true;
+  }
+  function add(yMin, yMax) {
+    const r = 25 + Math.round(Math.pow(Math.random(), 1.2) * 25);   // 50–100 px across, smaller ones more common
+    const amp = 8 + Math.random() * 10;
+    for (let i = 0; i < 200; i++) {
+      const x = W * X0 + r + Math.random() * Math.max(40, W * (X1 - X0) - 2 * r);
+      const y = yMin + Math.random() * (yMax - yMin);
+      if (!fits(x, y, r, amp)) continue;
+      const el = document.createElement('i');
+      el.style.width = el.style.height = r * 2 + 'px';
+      el.style.background = tint();
+      box.appendChild(el);
+      dots.push({ el, r, amp, x, y, phase: Math.random() * 6.28, period: 3000 + Math.random() * 3200, born: performance.now() });
+      return true;
+    }
+    return false;   // band is crowded right now: the next frames will retry as others leave
+  }
+  for (let i = 0; i < COUNT; i++) add(H * 0.5, H * 1.15);   // the first screen is already alive
+  let prev = performance.now();
+  (function frame(now) {
+    const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+    dots = dots.filter(d => {
+      d.y -= SPEED * dt;
+      if (d.y + d.r < -40) { d.el.remove(); return false; }
+      const f = spread(d.y);
+      const wave = Math.sin(now / d.period * Math.PI * 2 + d.phase);
+      const grow = Math.min(1, (now - d.born) / 900);
+      const fadeTop = Math.max(0, Math.min(1, (d.y + d.r) / (H * 0.08)));   // dissolves on the way out past the top edge
+      d.el.style.opacity = (grow * fadeTop).toFixed(3);
+      d.el.style.transform = `translate(${(fx(d.x + wave * d.amp, d.y) - d.r * f).toFixed(1)}px,${(d.y - d.r * f).toFixed(1)}px) scale(${f.toFixed(3)})`;
+      return true;
+    });
+    for (let guard = 0; guard < 6 && dots.length < COUNT; guard++)   // replacements rise from just below the fold
+      if (!add(H * 0.98, H * 1.15)) break;
+    requestAnimationFrame(frame);
+  })(performance.now());
+})();
 </script>
+<script>
+// the nav hover pill rides from item to item instead of blinking out on one and in on the next
+(() => {
+  const nav = document.getElementById('mainnav');
+  if (!nav) return;
+  const hl = document.createElement('i');
+  hl.className = 'navhl';
+  nav.appendChild(hl);
+  let parked = true;   // after the pointer leaves the menu the next landing snaps in place instead of sliding from the old spot
+  nav.addEventListener('mouseover', e => {
+    const it = e.target.closest('span');
+    if (!it || !nav.contains(it)) return;
+    const x = it.offsetLeft, w = it.offsetWidth;
+    if (parked) {
+      hl.classList.add('snap');
+      hl.style.left = x + 'px';
+      hl.style.width = w + 'px';
+      void hl.offsetWidth;              // settle the position, then hand movement back to the transitions
+      hl.classList.remove('snap');
+      parked = false;
+    } else {
+      hl.style.left = x + 'px';
+      hl.style.width = w + 'px';
+    }
+  });
+  nav.addEventListener('mouseleave', () => { parked = true; });
+})();
+</script>
+<script>
+// the logo takes you back to the first screen: the loop section's back-scroll shortcut stands down for the ride, so the page really reaches the top
+document.querySelector('.logo').addEventListener('click', () => {
+  window.goingHome = true;   // stands down the loop's back-scroll shortcut until the page is above the section (frame() clears it)
+  window.scrollTo({top: 0, behavior: 'smooth'});
+});
+</script>
+<style>
+/* the approved ring fit: 5% larger, turned round its own centre (the runner's circle) */
+.level-art{transform:scale(1.05);transform-origin:50.7% 47.9%}
+</style>
 </body>
 </html>
